@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +20,16 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    //käytettään aloitusruudun näyttämiseen
+    QTimer *splashTimer;
+    bool isSplashScreen;
+    //näyttää tai piilottaa pääruudun tekstit ja napit
+    void setMainControlsVisible(bool visible);
+
+private slots:
+    void showMainScreen();
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 };
 #endif // MAINWINDOW_H
