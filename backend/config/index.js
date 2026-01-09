@@ -1,6 +1,6 @@
-import 'dotenv/config';
+require('dotenv').config();
 
-export const config = {
+module.exports = {
   port: process.env.PORT ? Number(process.env.PORT) : 3000,
   db: {
     host: process.env.DB_HOST,
