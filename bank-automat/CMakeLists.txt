@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 project(bank-automat LANGUAGES CXX)
 
+set(CMAKE_AUTORCC ON)
+
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 
 qt_standard_project_setup()
@@ -11,6 +13,7 @@ qt_add_executable(bank-automat
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    images.qrc
 )
 
 target_link_libraries(bank-automat
