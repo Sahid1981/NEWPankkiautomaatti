@@ -18,7 +18,8 @@ app.use(logger('dev')); // Tulostaa jokaisen HTTP-pyynnön konsoliin
 app.use(express.json()); // Parsii JSON-request bodyt ja mahdollistaa req.body:n käytön
 app.use(express.urlencoded({ extended: false })); // Parsii lomakedatan. Tarpeellinen esim. HTML-formien kanssa
 app.use(cookieParser()); // Lukee cookiet ja mahdollistaa req.cookies:n käytön
-app.use(express.static(path.join(__dirname, 'public'))); // Tarjoaa staattisia tiedostoja. Näitä ei käytetä API:ssa, mutta Express-generator tuo ne oletuksena
+app.use(express.static(path.join(__dirname, 'public'))); /* Tarjoaa staattisia tiedostoja. Näitä ei käytetä API:ssa, mutta Express-generator tuo ne 
+oletuksena */
 
 // Reittien kytkentä
 app.use('/', indexRouter);

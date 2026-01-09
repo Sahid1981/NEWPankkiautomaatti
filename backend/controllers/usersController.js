@@ -1,4 +1,5 @@
-// Tämä tiedosto on esimerkkicontroller, jonka tarkoitus on todistaa, että HTTP-status-linjanveto, AppError ja errorHandler toimivat oikein, vaikka ei ole vielä tietokantaa.
+/* Tämä tiedosto on esimerkkicontroller, jonka tarkoitus on todistaa, että HTTP-status-linjanveto, AppError ja errorHandler toimivat oikein, vaikka ei 
+ole vielä tietokantaa. */
 
 // AppErrorin tuonti
 const AppError = require('../middleware/AppError');
