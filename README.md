@@ -15,3 +15,9 @@
 | Resurssia ei ole                       | **404 Not Found**             |
 | Duplikaatti (esim. kortti jo olemassa) | **409 Conflict**              |
 | Odottamaton virhe                      | **500 Internal Server Error** |
+
+## widget
+
+Testitunnukset:
+user
+pass
