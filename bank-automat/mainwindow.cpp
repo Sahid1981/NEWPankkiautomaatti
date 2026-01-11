@@ -16,6 +16,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // lisää mahdollisuus painaa enteriä kirjautumiseen
+    connect(ui->user, &QLineEdit::returnPressed, this, &MainWindow::on_KirjauduButton_clicked);
+    connect(ui->password, &QLineEdit::returnPressed, this, &MainWindow::on_KirjauduButton_clicked);
+
     // Lisää salasanakentälle näytä/piilota nappi
     QIcon showIcon(":/images/silmaa.svg");
     QIcon hideIcon(":/images/silmak.svg");
@@ -53,10 +57,9 @@ void MainWindow::showMainScreen()
 {
     isSplashScreen = false;
     splashTimer->stop();
-    //testaus voi poistaa myöhemmin
-    qDebug() << "Siirtyminen pääruutuun";
-    //näyttää login ruudun labelit ja napit
+    //näyttää login ruudun labelit ja napit ja siirtää kursorin käyttäjä kenttään
     setMainControlsVisible(true);
+     ui->user->setFocus();
     // Päivittää näkymän
     update();
 }
@@ -87,3 +90,24 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 }
 
+void MainWindow::on_KirjauduButton_clicked()
+{
+    QString username = ui->user->text().trimmed();
+    QString password = ui->password->text();
+
+    // Testaa kovakoodatut tunnukset
+    if (username == VALID_USERNAME && password == VALID_PASSWORD) {
+        
+        ui->welcomeLabel->setText("Kirjautuminen onnistui!");
+        ui->welcomeLabel->setStyleSheet("QLabel { color: green; font-size: 16px; }");
+        ui->welcomeLabel->setWordWrap(true); 
+        ui->welcomeLabel->adjustSize();  
+    } else {
+        ui->welcomeLabel->setText("Virheellinen käyttäjätunnus tai salasana!");
+        ui->welcomeLabel->setStyleSheet("QLabel { color: red; font-size: 16px; }");
+        ui->welcomeLabel->setWordWrap(true);
+        ui->welcomeLabel->adjustSize();  
+        ui->password->clear();
+        ui->password->setFocus();
+    }
+}
