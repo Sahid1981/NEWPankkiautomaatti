@@ -17,7 +17,7 @@
 
 --
 -- Table structure for table `accounts`
---
+-- HUOM: Tämä tiedosto olettaa, että olet jo tehnyt tietokannan bank_db ja käytät sitä
 
 DROP TABLE IF EXISTS `accounts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
