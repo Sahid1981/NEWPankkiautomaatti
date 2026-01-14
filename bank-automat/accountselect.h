@@ -1,0 +1,25 @@
+#ifndef ACCOUNTSELECT_H
+#define ACCOUNTSELECT_H
+
+#include <QDialog>
+
+namespace Ui {
+class accountselect;
+}
+
+class accountselect : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit accountselect(QWidget *parent = nullptr);
+    ~accountselect();
+
+private:
+    Ui::accountselect *ui;
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+};
+
+#endif // ACCOUNTSELECT_H
