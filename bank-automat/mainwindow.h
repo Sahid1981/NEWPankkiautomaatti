@@ -41,7 +41,7 @@ private:
 private slots:
     void showMainScreen();
     void on_KirjauduButton_clicked();
-    void openSelectWindow();    //QString username
+    void openSelectWindow();
 
 protected:
     void paintEvent(QPaintEvent *event) override;

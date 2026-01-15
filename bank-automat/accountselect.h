@@ -1,6 +1,7 @@
 #ifndef ACCOUNTSELECT_H
 #define ACCOUNTSELECT_H
 
+#include "account.h"
 #include <QDialog>
 
 namespace Ui {
@@ -18,6 +19,13 @@ public:
 private:
     Ui::accountselect *ui;
     QString cardnumber;
+    QString cardtype;
+    account *accountWindow;
+
+private slots:
+    void openAccountWindow();
+    void on_btnSelectCredit_clicked();
+    void on_btnSelectDebit_clicked();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
