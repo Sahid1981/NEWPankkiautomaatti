@@ -329,10 +329,10 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE sp_create_user(
-  IN p_iduser INT,
-  IN p_fname VARCHAR(50),
-  IN p_lname VARCHAR(50),
-  IN p_streetaddress VARCHAR(100)
+  IN p_iduser VARCHAR(45),
+  IN p_fname VARCHAR(45),
+  IN p_lname VARCHAR(45),
+  IN p_streetaddress VARCHAR(45)
 )
 BEGIN
 

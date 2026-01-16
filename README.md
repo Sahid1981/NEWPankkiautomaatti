@@ -24,7 +24,7 @@
 ```sql
 -- Lisää käyttäjän
 CALL sp_create_user(iduser, fname, lname,streetaddress);
--- Esimerkki: CALL sp_create_user(123,'matti', 'meikalainen','meikatie 1');
+-- Esimerkki: CALL sp_create_user('user123','matti', 'meikalainen','meikatie 1');
 ```
 
 #### Korttien hallinta
