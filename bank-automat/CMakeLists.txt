@@ -16,6 +16,8 @@ qt_add_executable(bank-automat
     images.qrc
     accountselect.h accountselect.cpp accountselect.ui
     account.h account.cpp account.ui
+    logevents.h logevents.cpp
+    log.h log.cpp
 )
 
 target_link_libraries(bank-automat

@@ -2,6 +2,7 @@
 #define ACCOUNT_H
 
 #include <QWidget>
+#include <QStandardItemModel>   //tableviewiä varten
 //Tarvitaan hard resettiin:
 #include <QProcess>
 #include <QCoreApplication>
@@ -26,6 +27,10 @@ private:
     double saldo = 355;
     double creditlimit = 1000;
     double nostosumma;
+
+    QStandardItemModel *tapahtumat;
+
+    QByteArray testData;
 
 protected:
     void paintEvent(QPaintEvent *event) override;

@@ -2,6 +2,8 @@
 #include "ui_account.h"
 #include <qpainter.h>
 
+#include <QStandardItemModel>
+
 
 account::account(QString cardnumber, QString cardtype,QWidget *parent)
     : QWidget(parent)
@@ -16,6 +18,7 @@ account::account(QString cardnumber, QString cardtype,QWidget *parent)
         "font-size: 18pt;"
         "qproperty-alignment: 'AlignCenter';"
         );
+    //Monta tapaa päästä allaolevaan, niin formatoidaan täällä kerran eikä joka paikassa erikseen
     ui->labelNostaVahvistaSumma->setStyleSheet(
         "font-size: 18pt;"
         "qproperty-alignment: 'AlignRight';"
@@ -23,6 +26,27 @@ account::account(QString cardnumber, QString cardtype,QWidget *parent)
         "border-radius: 15px;"
         "background-color: white;"
         );
+
+    auto *tapahtumat = new QStandardItemModel(0,3,this);
+    tapahtumat->setHeaderData(0, Qt::Horizontal, "Nro");
+    tapahtumat->setHeaderData(1, Qt::Horizontal, "Time");
+    tapahtumat->setHeaderData(2, Qt::Horizontal, "Change");
+    ui->tableTapahtumat->setModel(tapahtumat);
+    //Estetään käyttäjää  muokkaamasta tablen ulkonäköä ja säädetään ulkonäköä
+    ui->tableTapahtumat->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->tableTapahtumat->setColumnWidth(0,50);
+    ui->tableTapahtumat->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->tableTapahtumat->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    ui->tableTapahtumat->horizontalHeader()->setSectionsMovable(false);
+    ui->tableTapahtumat->horizontalHeader()->setSectionsClickable(false);
+    ui->tableTapahtumat->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+
+    //testidataa taulua varten
+    testData = R"([
+    {"idlog": 101, "idaccount": 5, "time": "2026-01-16 10:00:00", "balancechange": 50.00},
+    {"idlog": 102, "idaccount": 5, "time": "2026-01-16 10:30:00", "balancechange": 250.00},
+    {"idlog": 103, "idaccount": 5, "time": "2026-01-16 11:00:00", "balancechange": -12.50}
+])";
 }
 
 account::~account()
@@ -78,6 +102,8 @@ void account::on_btnSaldo_clicked()
 void account::on_btnTapahtumat_clicked()
 {
     ui->stackedAccount->setCurrentWidget(ui->screenTapahtumat);
+
+    //ui->tableTapahtumat->setModel(tapahtumat);
 }
 
 
