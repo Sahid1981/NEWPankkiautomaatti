@@ -485,7 +485,7 @@ END$$
 DELIMITER ;
 
 -- ADD ACCOUNT
--- example CALL sp_add_account(iduser, balance, credit_limit);
+-- example CALL sp_add_account(iduser, balance, creditlimit);
 
 DELIMITER $$
 CREATE PROCEDURE sp_add_account(
