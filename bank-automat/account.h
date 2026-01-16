@@ -22,6 +22,9 @@ private:
     Ui::account *ui;
     QString cardnumber;
     QString cardtype;
+    //annetaan testausta varten jotkut arvot
+    double saldo = 355;
+    double creditlimit = 1000;
 
 protected:
     void paintEvent(QPaintEvent *event) override;

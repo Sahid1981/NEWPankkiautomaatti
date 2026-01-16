@@ -11,7 +11,7 @@ account::account(QString cardnumber, QString cardtype,QWidget *parent)
 {
     ui->setupUi(this);
     ui->stackedAccount->setCurrentWidget(ui->screenLogin);
-    ui->labelLoginCardnumber->setText(cardnumber);
+    ui->labelLoginCardnumber->setText(cardnumber + " " + cardtype);
     ui->labelLoginCardnumber->setStyleSheet(
         "font-size: 18pt;"
         "qproperty-alignment: 'AlignCenter';"
@@ -34,6 +34,36 @@ void account::paintEvent(QPaintEvent *event)
 void account::on_btnSaldo_clicked()
 {
     ui->stackedAccount->setCurrentWidget(ui->screenSaldo);
+    ui->labelSaldoSaldo->setText(QString::asprintf("%.2f €", saldo));
+    ui->labelSaldoSaldo->setStyleSheet(
+        "font-size: 18pt;"
+        "qproperty-alignment: 'AlignRight';"
+        "border: 5px solid #7FABC4;"
+        "border-radius: 15px;"
+        "background-color: white;"
+        );
+    ui->labelSaldoCreditLimit->setText(QString::asprintf("%.2f €", creditlimit));
+    ui->labelSaldoCreditLimit->setStyleSheet(
+        "font-size: 18pt;"
+        "qproperty-alignment: 'AlignRight';"
+        "border: 5px solid #7FABC4;"
+        "border-radius: 15px;"
+        "background-color: white;"
+        );
+    ui->labelSaldoLuottoaJaljella->setText(QString::asprintf("%.2f €", creditlimit-saldo));
+    ui->labelSaldoLuottoaJaljella->setStyleSheet(
+        "font-size: 18pt;"
+        "qproperty-alignment: 'AlignRight';"
+        "border: 5px solid #7FABC4;"
+        "border-radius: 15px;"
+        "background-color: white;"
+        );
+    if (cardtype == "debit"){
+        ui->labelSaldoCreditLimit->hide();
+        ui->labelSaldoLuottoaJaljella->hide();
+        ui->labelSaldoCreditText->hide();
+        ui->labelSaldoLuottoText->hide();
+    }
 }
 
 
