@@ -50,6 +50,13 @@ CALL sp_delete_account(idaccount);
 
 #### Korttien hallinta
 
+**Kortin linkitys tiliin**
+```sql
+-- Linkittää kortin tiliin (kortti voi olla linkitetty vain yhteen tiliin)
+CALL sp_card_to_account(idcard, idaccount);
+-- Esimerkki: CALL sp_card_to_account('CARD123456', 1);
+```
+
 **Kortin poisto**
 ```sql
 -- Poistaa kortin

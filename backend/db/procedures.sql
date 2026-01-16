@@ -554,4 +554,76 @@ BEGIN
 END$$
 DELIMITER ;
 
+--ADD CARD TO ACCOUNT
+-- example CALL sp_card_to_account(idcard, idaccount);
+
+DELIMITER $$
+CREATE PROCEDURE sp_card_to_account(
+  IN p_idcard VARCHAR(45),
+  IN p_idaccount INT
+)
+BEGIN
+  DECLARE v_card_count INT;
+  DECLARE v_account_count INT;
+  DECLARE v_link_exists INT;
+  DECLARE v_is_locked TINYINT;
+
+  -- Validate parameters
+  IF p_idcard IS NULL OR p_idaccount IS NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Card ID and Account ID cannot be NULL';
+  END IF;
+
+  START TRANSACTION;
+
+  -- Check if card exists and get lock status
+  SELECT is_locked
+    INTO v_is_locked
+  FROM cards
+  WHERE idcard = p_idcard
+  FOR UPDATE;
+
+  IF ROW_COUNT() = 0 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Card not found';
+  END IF;
+
+  -- Check if card is locked
+  IF v_is_locked = 1 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Cannot link a locked card to an account';
+  END IF;
+
+  -- Check if account exists
+  SELECT COUNT(*) INTO v_account_count
+  FROM accounts
+  WHERE idaccount = p_idaccount
+  FOR UPDATE;
+
+  IF v_account_count = 0 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Account not found';
+  END IF;
+
+  -- Check if card is already linked to any account
+  SELECT COUNT(*) INTO v_link_exists
+  FROM accounts_cards
+  WHERE idcard = p_idcard;
+
+  IF v_link_exists > 0 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Card is already linked to another account';
+  END IF;
+
+  -- Link card to account
+  INSERT INTO accounts_cards (idcard, idaccount)
+  VALUES (p_idcard, p_idaccount);
+  
+  COMMIT;
+END$$
+DELIMITER ;
+
 -- END PROCEDURES
