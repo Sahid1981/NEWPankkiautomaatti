@@ -1,6 +1,6 @@
 -- PROCEDURES
 
--- CREDIT WHITDRAW
+-- CREDIT WITHTDRAW
 -- example CALL sp_credit_withdraw(idaccount, amount);
 DELIMITER $$
 
@@ -105,7 +105,7 @@ END$$
 
 DELIMITER ;
 
--- WHITDRAW
+-- WITHTDRAW
 -- example CALL sp_withdraw(idaccount, amount);
 
 DELIMITER $$
@@ -228,7 +228,8 @@ BEGIN
     FROM accounts
   WHERE idaccount = p_idaccount_from
   FOR UPDATE;
-
+  
+  -- Check if source account exists
   IF ROW_COUNT() = 0 THEN
     ROLLBACK;
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Source account not found';
@@ -240,9 +241,15 @@ BEGIN
   WHERE idaccount = p_idaccount_to
   FOR UPDATE;
 
+  -- Check if destination account exists
   IF ROW_COUNT() = 0 THEN
     ROLLBACK;
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Destination account not found';
+  END IF;
+
+  -- Prevents transfer to same account
+  IF p_idaccount_from = p_idaccount_to THEN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot transfer to the same account';
   END IF;
 
   -- Checks balance
@@ -369,6 +376,7 @@ CREATE PROCEDURE sp_delete_user(
 BEGIN
   DECLARE v_user_count INT;
   DECLARE v_account_count INT;
+  DECLARE v_card_count INT;
 
   START TRANSACTION;
 
@@ -393,6 +401,17 @@ BEGIN
     ROLLBACK;
     SIGNAL SQLSTATE '45000'
       SET MESSAGE_TEXT = 'Cannot delete user with existing accounts. Delete accounts first.';
+  END IF;
+
+  -- Check if user has cards
+  SELECT COUNT(*) INTO v_card_count
+  FROM cards
+  WHERE iduser = p_iduser;
+
+  IF v_card_count > 0 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Cannot delete user with existing cards. Delete cards first.';
   END IF;
 
   -- Delete user
@@ -444,6 +463,10 @@ BEGIN
   DELETE FROM log
   WHERE idaccount = p_idaccount;
 
+  -- Remove any lingering links
+  DELETE FROM accounts_cards
+  WHERE idaccount = p_idaccount;
+  
   -- Delete account
   DELETE FROM accounts
   WHERE idaccount = p_idaccount;
@@ -477,6 +500,10 @@ BEGIN
       SET MESSAGE_TEXT = 'Card not found';
   END IF;
 
+  -- Remove links first to avoid FK errors
+  DELETE FROM accounts_cards
+  WHERE idcard = p_idcard;
+  
   -- Delete card
   DELETE FROM cards
   WHERE idcard = p_idcard;
@@ -503,6 +530,15 @@ BEGIN
   FROM users
   WHERE iduser = p_iduser
   FOR UPDATE;
+
+  -- Validate balance and credit limit
+  IF p_balance IS NULL OR p_balance < 0 THEN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Balance cannot be NULL or negative';
+  END IF;
+
+  IF p_creditlimit IS NULL OR p_creditlimit < 0 THEN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Credit limit must be 0 or greater';
+  END IF;
 
   IF v_user_count = 0 THEN
     ROLLBACK;
