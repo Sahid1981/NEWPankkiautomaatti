@@ -431,7 +431,7 @@ BEGIN
 
   -- Check if account has cards
   SELECT COUNT(*) INTO v_card_count
-  FROM cards
+  FROM accounts_cards
   WHERE idaccount = p_idaccount;
 
   IF v_card_count > 0 THEN
@@ -511,7 +511,7 @@ BEGIN
   END IF;
 
   -- Insert new account
-  INSERT INTO accounts (iduser, balance, credit_limit)
+  INSERT INTO accounts (iduser, balance, creditlimit)
   VALUES (p_iduser, p_balance, p_creditlimit);
 
   COMMIT;
