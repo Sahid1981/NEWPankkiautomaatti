@@ -1,285 +1,317 @@
-# API-sopimus v0 (Qt ↔ Backend)
+# Bank-ATM API – Contract v0
 
-Base URL (local): `http://localhost:3000`  
-Kaikki pyynnöt ja vastaukset ovat JSON-muodossa.  
-Autentikointi: `Authorization: Bearer <token>` (kirjautumisen jälkeen).
-
-## Yhteinen virhemuoto
-```json
-{ "error": "Error", "message": "..." }
-```
-
-## Mallinnus: DEBIT vs CREDIT (tärkeä)
-
-Backend päättelee tilin tyypin skeemasta:
-- jos `creditlimit > 0` → `CREDIT`
-- muuten → `DEBIT`
-
-**DB-proseduurien mukainen luottotilin logiikka (CREDIT):**
-- `balance`= **käytetty luotto / velka** (0…creditlimit), ei “tilin saldo”
-- käytettävissä oleva luotto: `availableCredit = creditlimit - balance`
-- luoton nosto kasvattaa `balance`a
-- luoton takaisinmaksu pienentää `balance`a
-
-**DEBIT-tilillä:**
-- `balance` = rahasaldo, ei saa mennä miinukselle.
-
-### 1) POST /auth/login
-
-Kirjautuminen kortin ID:llä ja PIN-koodilla.<br>
-PIN tarkistetaan bcryptillä.<br>
-Jos kortilla on useampi tili (esim. debit + credit), Qt pyytää käyttäjältä tilin valinnan.
-
-**Pyyntö**
-```json
-{ "cardId": "CARD123456", "pin": "1234" }
-```
-
-**Vastaus 200 OK**
+## 0. Metatiedot
+- **Nimi:** Bank-ATM REST API
+- **Versio:** v0
+- **Base URL:** `/api/v0`
+- **Content-Type:** `application/json; charset=utf-8`
+- **Auth:** JWT (`Authorization: Bearer <token>`)
+- **Virhevastauksen muoto (yhtenäinen):**
 ```json
 {
-  "token": "token-here",
-  "card": { "idcard": "CARD123456", "iduser": "TESTUSER1" },
+  "error": "ErrorName",
+  "message": "Human readable message",
+  "stack": "optional in non-production"
+}
+```
+
+## 1. Statuskoodit
+
+| Koodi | Selitys               |
+| ----- | --------------------- |
+| 200   | OK                    |
+| 201   | Created               |
+| 204   | No Content            |
+| 400   | Bad Request           |
+| 401   | Unauthorized          |
+| 403   | Forbidden             |
+| 404   | Not Found             |
+| 409   | Conflict              |
+| 500   | Internal Server Error |
+
+## 2. Tietomallit
+
+### User
+
+```json
+{
+  "idUser": "TESTUSER1",
+  "firstName": "Testi",
+  "lastName": "Asiakas",
+  "streetAddress": "Testikatu 1"
+}
+```
+
+### Card
+
+```json
+{
+  "idCard": "CARD123456",
+  "idUser": "TESTUSER1",
+  "isLocked": false
+}
+```
+> PIN:tä ei koskaan palauteta API:sta. PIN tallennetaan hashattuna.
+
+### Account
+
+```json
+{
+  "idAccount": 1,
+  "idUser": "TESTUSER1",
+  "balance": 500.00,
+  "creditLimit": 0.00,
+  "type": "debit"
+}
+```
+
+### LogEntry
+
+```json
+{
+  "idLog": 10,
+  "idAccount": 1,
+  "time": "2026-01-16T09:30:00.123Z",
+  "balanceChange": -40.00
+}
+```
+
+## 3. Autentikointi
+
+### 3.1 Kirjautuminen (kortti + PIN)
+
+#### POST `/auth/login`
+
+```json
+{
+  "idCard": "CARD123456",
+  "pin": "1234"
+}
+```
+
+#### 200 OK
+
+```json
+{
+  "token": "jwt...",
+  "card": {
+    "idCard": "CARD123456",
+    "idUser": "TESTUSER1",
+    "isLocked": false
+  },
   "accounts": [
+    { "idAccount": 1, "type": "debit", "balance": 500.00, "creditLimit": 0.00 },
+    { "idAccount": 2, "type": "credit", "balance": 100.00, "creditLimit": 2000.00 }
+  ],
+  "requiresAccountSelection": true
+}
+```
+
+### 3.2 Tilin valinta (kaksoiskortti)
+
+#### POST `/auth/select-account`
+
+```json
+{
+  "idAccount": 1
+}
+```
+
+#### 200 OK
+
+```json
+{
+  "activeAccount": {
+    "idAccount": 1,
+    "type": "debit"
+  }
+}
+```
+
+### 3.3 Logout
+
+#### POST `/auth/logout` → 204 No Content
+
+## 4. ATM-toiminnot
+
+### 4.1 Saldon haku
+
+#### GET `/accounts/{idAccount}`
+
+```json
+{
+  "idAccount": 1,
+  "balance": 480.00,
+  "creditLimit": 0.00,
+  "type": "debit"
+}
+```
+
+### 4.2 Tilitapahtumat
+
+#### GET `/accounts/{idAccount}/logs?limit=20&cursor=10`
+
+```json
+{
+  "items": [
     {
-      "idaccount": 1,
-      "type": "DEBIT",
-      "balance": 500.00,
-      "creditlimit": 0.00,
-      "availableCredit": null
-    },
-    {
-      "idaccount": 2,
-      "type": "CREDIT",
-      "balance": 300.00,
-      "creditlimit": 2000.00,
-      "availableCredit": 1700.00
+      "idLog": 12,
+      "time": "2026-01-16T09:30:00.123Z",
+      "balanceChange": -20.00
     }
   ],
-  "requiresAccountChoice": true
+  "nextCursor": 12
 }
 ```
 
-**Huomiot**
-- `availableCredit` palautetaan vain CREDIT-tileille (muuten `null`).
-- `requiresAccountChoice = true`, jos tilejä > 1.
+### 4.3 Nosto (debit)
 
-**Statuskoodit**
-- 200 OK – kirjautuminen onnistui
-- 400 Bad Request – `cardId` tai `pin` puuttuu
-- 401 Unauthorized – virheellinen kortti-ID tai PIN
-- 423 Locked – kortti lukittu (kun toteutettu / DB `cards.islocked`)
+#### POST /accounts/{idAccount}/withdraw
 
-### 2) GET /accounts/:id/balance
+```json
+{ "amount": 40.00 }
+```
 
-Palauttaa tilin saldon/velan ja luottorajan.
+#### 200 OK
 
-**Vastaus 200 OK**
 ```json
 {
-  "idaccount": 2,
-  "type": "CREDIT",
-  "balance": 300.00,
-  "creditlimit": 2000.00,
-  "availableCredit": 1700.00
+  "idAccount": 1,
+  "balance": 440.00,
+  "logged": true
 }
 ```
 
-**Statuskoodit**
-- 200 OK
-- 401 Unauthorized
-- 403 Forbidden – ei oikeutta kyseiseen tiliin
-- 404 Not Found – tiliä ei löydy
+### 4.4 Talletus
 
-### 3) POST /accounts/:id/withdraw
+#### POST `/accounts/{idAccount}/deposit`
 
-Nosto tililtä.<br>
-Summa on vapaavalintainen, mutta sen täytyy olla toteutettavissa **20 € ja 50 € seteleillä**.<br>
-Backend hoitaa sekä DEBIT- että CREDIT-tilit:
-- DEBIT → kutsuu `sp_withdraw(idaccount, amount)`
-- CREDIT → kutsuu `sp_credit_withdraw(idaccount, amount)`
-
-**Pyyntö**
-```json
-{ "amount": 130 }
-```
-
-**Vastaus 200 OK**
-```json
-{
-  "idaccount": 1,
-  "type": "DEBIT",
-  "amount": 130,
-  "dispensed": { "eur50": 1, "eur20": 4 },
-  "balanceBefore": 480.00,
-  "balanceAfter": 350.00,
-  "logId": 123
-}
-```
-
-**Validointisäännöt**
-- `amount` on positiivinen kokonaisluku
-- `amount` on muodostettavissa 20 € ja 50 € seteleistä<br>
-(löytyy kokonaisluvut a,b siten että `20*a + 50*b = amount`)
-- DEBIT: `balance >= amount`
-- CREDIT (DB-proseduurien mukaisesti): `availableCredit = creditlimit - balance` ja `availableCredit >= amount`
-
-**Statuskoodit**
-- 200 OK – nosto onnistui
-- 400 Bad Request – virheellinen summa / ei muodostettavissa seteleillä
-- 401 Unauthorized
-- 403 Forbidden
-- 404 Not Found – tiliä ei löydy
-- 409 Conflict – kate tai käytettävissä oleva luotto ei riitä
-
-### 4) POST /accounts/:id/deposit
-
-Talletus DEBIT-tilille (tai yleisesti tilille, jos sallitaan).<br>
-DB-proseduuri: `sp_deposit(idaccount, amount)`.
-
-**Pyyntö**
 ```json
 { "amount": 100.00 }
 ```
 
-**Vastaus 200 OK**
+### 4.5 Tilisiirto
+
+#### POST `/accounts/transfer`
+
 ```json
 {
-  "idaccount": 1,
-  "type": "DEBIT",
-  "amount": 100.00,
-  "balanceBefore": 350.00,
-  "balanceAfter": 450.00,
-  "logId": 124
+  "fromIdAccount": 1,
+  "toIdAccount": 2,
+  "amount": 75.00
 }
 ```
 
-**Validointisäännöt**
-- `amount` > 0 (desimaalit sallittu 2 tarkkuudella)
+## 5. Credit-toiminnot
 
-**Statuskoodit**
-- 200 OK
-- 400 Bad Request
-- 401 Unauthorized
-- 403 Forbidden
-- 404 Not Found
+### 5.1 Credit nosto
 
-### 5) POST /accounts/:id/credit-repay
+#### POST `/accounts/{idAccount}/credit/withdraw`
 
-Luottotilin takaisinmaksu.<br>
-DB-proseduuri: `sp_credit_repay(idaccount, amount)`.
+```json
+{ "amount": 200.00 }
+```
 
-**Pyyntö**
+### 5.2 Credit takaisinmaksu
+
+#### POST `/accounts/{idAccount}/credit/repay`
+
 ```json
 { "amount": 150.00 }
 ```
 
-**Vastaus**
+## 6. Kortit
+
+### Lukitse kortti
+
+#### POST `/cards/{idCard}/lock` → 204
+
+### Avaa lukitus
+
+#### POST `/cards/{idCard}/unlock` → 204
+
+### Luo kortti
+
+#### POST `/cards`
+
 ```json
 {
-  "idaccount": 2,
-  "type": "CREDIT",
-  "amount": 150.00,
-  "balanceBefore": 300.00,
-  "balanceAfter": 150.00,
-  "availableCreditAfter": 1850.00,
-  "logId": 125
+  "idCard": "CARD999",
+  "idUser": "TESTUSER1",
+  "pin": "1234"
 }
 ```
 
-**Validointisäännöt (DB:n mukaisesti)**
-- `amount` > 0
-- ei saa maksaa “liikaa”: `balance >= amount` (balance = käytetty luotto)
+### Linkitä kortti tiliin
 
-**Statuskoodit**
-- 200 OK
-- 400 Bad Request
-- 401 Unauthorized
-- 403 Forbidden
-- 404 Not Found
-- 409 Conflict – yritettiin maksaa liikaa / muu ristiriita
+#### POST `/cards/{idCard}/accounts`
 
-### 6) POST /transfer
-
-Tilisiirto tililtä toiselle.<br>
-DB-proseduuri: `sp_transfer(idaccount_from, idaccount_to, amount)`.
-
-**Pyyntö**
 ```json
-{ "fromAccountId": 1, "toAccountId": 2, "amount": 75.00 }
+{ "idAccount": 2 }
 ```
 
-**Vastaus 200 OK**
+## 7. Käyttäjät (CRUD)
+
+### Luo käyttäjä
+
+#### POST `/users`
+
 ```json
 {
-  "fromAccountId": 1,
-  "toAccountId": 2,
-  "amount": 75.00,
-  "fromBalanceBefore": 450.00,
-  "fromBalanceAfter": 375.00,
-  "toBalanceBefore": 150.00,
-  "toBalanceAfter": 225.00,
-  "fromLogId": 126,
-  "toLogId": 127
+  "idUser": "user123",
+  "firstName": "Matti",
+  "lastName": "Meikäläinen",
+  "streetAddress": "Meikatie 1"
 }
 ```
 
-**Validointisäännöt**
-- `amount` > 0
-- `fromAccountId != toAccountId`
-- lähdetilillä oltava kate (DEBIT-logiikka DB-proseduurin mukaisesti)
+### Hae käyttäjä
 
-**Statuskoodit**
-- 200 OK
-- 400 Bad Request
-- 401 Unauthorized
-- 403 Forbidden – ei oikeutta lähdetiliin (ja/tai kohdetiliin)
-- 404 Not Found – lähde tai kohde puuttuu
-- 409 Conflict – kate ei riitä
+#### GET `/users/{idUser}`
 
-### 7) GET /accounts/:id/transactions
+### Päivitä käyttäjä
 
-Tilitapahtumien selaus **10 tapahtumaa kerrallaan**, eteen ja taakse.
+#### PATCH `/users/{idUser}`
 
-**Query-parametrit**
-- `limit` (oletus 10, max 50)
-- `cursor` (valinnainen): API:n palauttama osoitin
-- `direction` = `next` | `prev` (oletus `next`)
+```json
+{ "streetAddress": "Uusi osoite 5" }
+```
 
-**Esimerkki: ensimmäinen sivu (uusimmat)**
-`GET /accounts/1/transactions?limit=10`
+### Poista käyttäjä
 
-**Vastaus 200 OK**
+#### DELETE `/users/{idUser}` → 204
+
+## 8. Tilit (CRUD)
+
+### Luo tili
+
+#### POST `/accounts`
+
 ```json
 {
-  "idaccount": 1,
-  "limit": 10,
-  "items": [
-    { "idlog": 120, "time": "2026-01-14T10:00:00.000Z", "balancechange": -40.00 },
-    { "idlog": 119, "time": "2026-01-13T10:00:00.000Z", "balancechange": -20.00 }
-  ],
-  "nextCursor": "opaque-cursor-for-older-items",
-  "prevCursor": null
+  "idUser": "user123",
+  "balance": 1000.00,
+  "creditLimit": 500.00
 }
 ```
 
-**Statuskoodit**
-- 200 OK
-- 401 Unauthorized
-- 403 Forbidden
-- 404 Not Found
+### Poista tili
 
-### 8) POST /cards/:id/lock
+#### DELETE `/accounts/{idAccount}` → 204
 
-DB-proseduuri: `sp_card_lock(idcard)`
+## 9. Lokit
 
-**Vastaus 204 No Content (tai 200 OK)**
-- 204 No Content – onnistui
-- 401/403 – ei oikeutta
-- 404 – korttia ei löydy
+### Hae yksittäinen loki
 
-### 9) POST /cards/:id/unlock
+#### GET `/logs/{idLog}`
 
-DB-proseduuri: `sp_card_unlock(idcard)`.
+### Poista loki (admin)
 
-**Vastaus 204 No Content** (tai 200 OK)
+#### DELETE `/logs/{idLog}` → 204
+
+## 10. Huomioita
+
+- Saldoa saa muuttaa vain transaktio-endpointeilla
+- Kaikki nostot/talletukset luovat logimerkinnän
+- Kaksoiskortti vaatii tilin valinnan
+- PIN käsitellään vain hashattuna
