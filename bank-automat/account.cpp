@@ -27,32 +27,36 @@ account::account(QString cardnumber, QString cardtype,QWidget *parent)
         "background-color: white;"
         );
 
-    tapahtumat = new QStandardItemModel(0,3,this);
-    tapahtumat->setHeaderData(0, Qt::Horizontal, "Nro");
-    tapahtumat->setHeaderData(1, Qt::Horizontal, "Time");
-    tapahtumat->setHeaderData(2, Qt::Horizontal, "Change");
-    ui->tableTapahtumat->setModel(tapahtumat);
-
     //testidataa taulua varten
     testData = R"([
     {"idlog": 1, "time": "2026-01-18 12:00", "balancechange": -20.50},
     {"idlog": 2, "time": "2026-01-18 12:05", "balancechange": 100.00},
-    {"idlog": 3, "time": "2026-01-18 13:30", "balancechange": -5.00}
+    {"idlog": 3, "time": "2026-01-18 13:30", "balancechange": -5.00},
+    {"idlog": 4, "time": "2026-01-18 14:15", "balancechange": -12.80},
+    {"idlog": 5, "time": "2026-01-18 15:00", "balancechange": 2450.00},
+    {"idlog": 6, "time": "2026-01-18 16:45", "balancechange": -65.20},
+    {"idlog": 7, "time": "2026-01-19 08:30", "balancechange": -4.50},
+    {"idlog": 8, "time": "2026-01-19 09:12", "balancechange": -110.00},
+    {"idlog": 9, "time": "2026-01-19 11:50", "balancechange": 15.00},
+    {"idlog": 10, "time": "2026-01-19 13:20", "balancechange": -22.15},
+    {"idlog": 11, "time": "2026-01-19 17:05", "balancechange": -45.00},
+    {"idlog": 12, "time": "2026-01-20 10:00", "balancechange": -3.20},
+    {"idlog": 13, "time": "2026-01-20 12:30", "balancechange": 50.00},
+    {"idlog": 14, "time": "2026-01-20 15:45", "balancechange": -200.00},
+    {"idlog": 15, "time": "2026-01-20 18:20", "balancechange": -8.90}
     ])";
 
-    // ptr_logs = new logs(this);
-    // ui->tableTapahtumat->setModel(ptr_logs->getModel());
-    // ptr_logs->setLog(testData);
+    tapahtumat = new logs(this);
+    ui->tableTapahtumat->setModel(tapahtumat->getModel());
+    tapahtumat->setLog(testData);
+
     //Estetään käyttäjää  muokkaamasta tablen ulkonäköä ja säädetään ulkonäköä
-    ui->tableTapahtumat->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
-    ui->tableTapahtumat->setColumnWidth(0,50);
+
+    ui->tableTapahtumat->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->tableTapahtumat->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->tableTapahtumat->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
     ui->tableTapahtumat->horizontalHeader()->setSectionsMovable(false);
     ui->tableTapahtumat->horizontalHeader()->setSectionsClickable(false);
     ui->tableTapahtumat->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-
-
 }
 
 account::~account()
@@ -108,11 +112,6 @@ void account::on_btnSaldo_clicked()
 void account::on_btnTapahtumat_clicked()
 {
     ui->stackedAccount->setCurrentWidget(ui->screenTapahtumat);
-
-
-
-
-    //ui->tableTapahtumat->setModel(tapahtumat);
 }
 
 

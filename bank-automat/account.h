@@ -30,8 +30,8 @@ private:
     double creditlimit = 1000;
     double nostosumma;
 
-    QStandardItemModel *tapahtumat = nullptr;
-    class logs *ptr_logs;
+    //QStandardItemModel *tapahtumat = nullptr;
+    class logs *tapahtumat;
 
     QByteArray testData;
 

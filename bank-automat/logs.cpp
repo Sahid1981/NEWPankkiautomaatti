@@ -5,7 +5,12 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-logs::logs(QObject *parent) : QObject(parent) {}
+logs::logs(QObject *parent) : QObject(parent) {
+    tableModel = new QStandardItemModel(this);
+    tableModel->setRowCount(0);
+    tableModel->setColumnCount(2);
+    tableModel->setHorizontalHeaderLabels({"Aika", "Muutos"});
+}
 
 void logs::setLog(const QByteArray &newLog)
 {
@@ -15,24 +20,23 @@ void logs::setLog(const QByteArray &newLog)
 
     QVector<logevents> loglist;
     for (const QJsonValue &value : json_array) {
+        //jsonista c++ objektiksi
         if (value.isObject()) {
             logevents logev = logevents::mapJson(value.toObject());
             loglist.append(logev);
         }
     }
-
+    //nollataan varmuuden vuoksi
     tableModel->setRowCount(0);
-    tableModel->setColumnCount(3);
-    tableModel->setHorizontalHeaderLabels({"ID", "Aika", "Muutos"});
 
     for (int row = 0; row < loglist.size(); row ++) {
+        //ja QStandarditemiin
         const logevents &event = loglist[row];
-
-        QStandardItem *ID = new QStandardItem(QString::number(event.idlog));
         QStandardItem *aika = new QStandardItem(event.time);
-        aika->setTextAlignment(Qt::AlignRight);
+        aika->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balancechange));
-
-        tableModel->appendRow({ID, aika, muutos});
+        muutos->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        tableModel->appendRow({aika, muutos});
     }
+
 }
