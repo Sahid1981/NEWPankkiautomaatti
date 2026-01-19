@@ -2,6 +2,58 @@
 
 ## Backend-osio
 
+### API Käynnistys
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+API pyörii osoitteessa: `http://localhost:3000`
+
+### REST API Endpoints (CRUD)
+
+#### Käyttäjät (Users)
+
+- **GET /users** - Hae kaikki käyttäjät
+- **GET /users/:idUser** - Hae käyttäjä ID:llä
+- **POST /users** - Luo uusi käyttäjä
+  ```json
+  {
+    "idUser": "USER123",
+    "firstName": "Matti",
+    "lastName": "Meikäläinen",
+    "streetAddress": "Esimerkkitie 1"
+  }
+  ```
+- **PUT /users/:idUser** - Päivitä käyttäjän tiedot
+- **DELETE /users/:idUser** - Poista käyttäjä
+
+#### Kortit ja Tilit (Cards & Accounts)
+
+- **GET /cardsaccounts/:idCard** - Hae kortin linkitetyt tilit
+- **POST /cardsaccounts** - Linkitä kortti tiliin
+  ```json
+  {
+    "idCard": "CARD123456",
+    "idAccount": 1
+  }
+  ```
+- **PUT /cardsaccounts/:idCard** - Päivitä kortin tiliyhdistelmä
+  ```json
+  {
+    "IdAccount": 1,
+    "newIdAccount": 2
+  }
+  ```
+- **DELETE /cardsaccounts/:idCard** - Poista kortin ja tilin linkki
+  ```json
+  {
+    "IdAccount": 1
+  }
+  ```
+
 ### Backend status taulukko
 
 | Tilanne                                | Status                        |
@@ -68,6 +120,14 @@ CALL sp_delete_account(idaccount);
 
 #### Korttien hallinta
 
+**Kortin tietojen hakeminen (päivitetty)**
+```sql
+-- Hakee kortin linkitetyt tilit
+CALL sp_get_card_info(idcard);
+-- Esimerkki: CALL sp_get_card_info('CARD123456');
+-- Palauttaa: idcard, idaccount
+```
+
 **Kortin linkitys tiliin**
 ```sql
 -- Linkittää kortin tiliin
@@ -82,6 +142,19 @@ CALL sp_delete_card(idcard);
 -- Esimerkki: CALL sp_delete_card('CARD123456');
 ```
 
+**Kortin ja tilin linkin poisto**
+```sql
+-- Poistaa kortin ja tilin välisen linkin
+CALL sp_remove_card_from_account(idcard, idaccount);
+-- Esimerkki: CALL sp_remove_card_from_account('CARD123456', 1);
+```
+
+**Kortin tiliyhdistelmän päivitys**
+```sql
+-- Päivittää kortin vanhasta tilistä uuteen tiliin
+CALL sp_update_card_linked_account(idcard, old_idaccount, new_idaccount);
+-- Esimerkki: CALL sp_update_card_linked_account('CARD123456', 1, 2);
+```
 
 **Kortin lukitseminen**
 ```sql
