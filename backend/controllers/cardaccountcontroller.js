@@ -22,8 +22,8 @@ function mapProcedureSignalToHttp(err) {
     
     if (msg.includes('card account link already exists')) return new AppError('Card account link already exists', 409);
     if (msg.includes('cannot link a locked card')) return new AppError('Cannot link a locked card', 409);
-    if (msg.includes('Link between card and account not found')) return new AppError('Link between card and account not found', 404);
-    if (msg.includes('New account not found')) return new AppError('New account not found', 404);
+    if (msg.includes('link between card and account not found')) return new AppError('Link between card and account not found', 404);
+    if (msg.includes('new account not found')) return new AppError('New account not found', 404);
     if (msg.includes('cannot change card between credits and debits')) return new AppError('Cannot change card between credits and debits', 409);
     
     if (msg.includes('cannot be null') ||
@@ -99,7 +99,7 @@ async function deleteCardAccount(req, res, next) {
         if (!idCard || !idAccount) throw new AppError('Card id and account id are required', 400);
         // Call stored procedure
         await pool.execute('CALL sp_remove_card_from_account(?, ?)', [idCard, idAccount]);
-        res.status(200).json({ message: 'Card account link deleted successfully' });
+        res.status(204).json({ message: 'Card account link deleted successfully' });
     } catch (err) {
         const appError = mapProcedureSignalToHttp(err);
         if (appError) return next(appError);
