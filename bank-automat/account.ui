@@ -14,32 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>177</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="1">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>362</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="1" column="0">
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -66,6 +40,32 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="1">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>362</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>177</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="1" column="1">
     <widget class="QStackedWidget" name="stackedAccount">
      <property name="minimumSize">
@@ -81,7 +81,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="screenSaldo">
       <widget class="QPushButton" name="btnTakaisinSaldo">
@@ -100,14 +100,94 @@
       <widget class="QLabel" name="label_3">
        <property name="geometry">
         <rect>
-         <x>250</x>
-         <y>250</y>
-         <width>49</width>
-         <height>16</height>
+         <x>130</x>
+         <y>170</y>
+         <width>151</width>
+         <height>61</height>
         </rect>
        </property>
        <property name="text">
-        <string>saldo</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:24pt;&quot;&gt;Tilin saldo:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelSaldoSaldo">
+       <property name="geometry">
+        <rect>
+         <x>360</x>
+         <y>180</y>
+         <width>221</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>0 €</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelSaldoCreditText">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>240</y>
+         <width>181</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:24pt;&quot;&gt;Credit Limit:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelSaldoLuottoText">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>310</y>
+         <width>221</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:24pt;&quot;&gt;Luottoa jäljellä:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelSaldoLuottoaJaljella">
+       <property name="geometry">
+        <rect>
+         <x>360</x>
+         <y>320</y>
+         <width>221</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>0 €</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelSaldoCreditLimit">
+       <property name="geometry">
+        <rect>
+         <x>360</x>
+         <y>250</y>
+         <width>221</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>0 €</string>
        </property>
       </widget>
      </widget>
@@ -125,17 +205,43 @@
         <string>Takaisin</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_4">
+      <widget class="QTableView" name="tableTapahtumat">
        <property name="geometry">
         <rect>
-         <x>200</x>
-         <y>246</y>
-         <width>71</width>
-         <height>20</height>
+         <x>115</x>
+         <y>71</y>
+         <width>561</width>
+         <height>371</height>
+        </rect>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnTapahtumatVasen">
+       <property name="geometry">
+        <rect>
+         <x>390</x>
+         <y>530</y>
+         <width>100</width>
+         <height>50</height>
         </rect>
        </property>
        <property name="text">
-        <string>tapahtumat</string>
+        <string>&lt;&lt;</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnTapahtumatOikea">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>530</y>
+         <width>100</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&gt;&gt;</string>
        </property>
       </widget>
      </widget>
@@ -260,8 +366,8 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="screenNosta">
-      <widget class="QPushButton" name="btnTakaisinNosta">
+     <widget class="QWidget" name="screenNostaValitse">
+      <widget class="QPushButton" name="btnTakaisinNostaValitse">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -278,7 +384,7 @@
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>200</y>
+         <y>110</y>
          <width>211</width>
          <height>41</height>
         </rect>
@@ -290,8 +396,8 @@
       <widget class="QLabel" name="label_2">
        <property name="geometry">
         <rect>
-         <x>190</x>
-         <y>470</y>
+         <x>200</x>
+         <y>390</y>
          <width>341</width>
          <height>31</height>
         </rect>
@@ -305,11 +411,11 @@
         <string>Huom. Automaatissa vain 20 ja 50€ seteleitä</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnNosta20">
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>260</y>
+         <y>170</y>
          <width>100</width>
          <height>50</height>
         </rect>
@@ -323,11 +429,11 @@
         <string>20 €</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btnNosta40">
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>340</y>
+         <y>250</y>
          <width>100</width>
          <height>50</height>
         </rect>
@@ -341,11 +447,11 @@
         <string>40 €</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="btnNosta50">
        <property name="geometry">
         <rect>
          <x>390</x>
-         <y>260</y>
+         <y>170</y>
          <width>100</width>
          <height>50</height>
         </rect>
@@ -359,11 +465,11 @@
         <string>50 €</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_4">
+      <widget class="QPushButton" name="btnNosta100">
        <property name="geometry">
         <rect>
          <x>390</x>
-         <y>340</y>
+         <y>250</y>
          <width>100</width>
          <height>50</height>
         </rect>
@@ -377,11 +483,11 @@
         <string>100 €</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_5">
+      <widget class="QPushButton" name="btnNostaMuu">
        <property name="geometry">
         <rect>
          <x>390</x>
-         <y>420</y>
+         <y>330</y>
          <width>100</width>
          <height>50</height>
         </rect>
@@ -395,11 +501,11 @@
         <string>Muu</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="nostosumma">
+      <widget class="QLineEdit" name="labelNostosumma">
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>420</y>
+         <y>330</y>
          <width>101</width>
          <height>51</height>
         </rect>
@@ -408,6 +514,104 @@
         <font>
          <pointsize>18</pointsize>
         </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelNostaValitseVirhe">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>430</y>
+         <width>221</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Virheellinen summa</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelNostaValitseKate">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>470</y>
+         <width>121</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Kate ei riitä</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="screenNostaVahvista">
+      <widget class="QPushButton" name="btnTakaisinNostaVahvista">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>530</y>
+         <width>100</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Takaisin</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_7">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>270</y>
+         <width>241</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:24pt;&quot;&gt;Olet nostamassa&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelNostaVahvistaSumma">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>270</y>
+         <width>221</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>0 €</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnNostaVahvistaVahvista">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>530</y>
+         <width>100</width>
+         <height>50</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Vahvista</string>
        </property>
       </widget>
      </widget>

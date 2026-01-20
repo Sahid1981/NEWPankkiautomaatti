@@ -99,7 +99,7 @@ void MainWindow::on_KirjauduButton_clicked()
         ui->welcomeLabel->setWordWrap(true);
         ui->welcomeLabel->adjustSize();
 
-        //Jos vain debit niin tähän logiikka suoraan tilinhallintaan ilman tilinvalintaa?
+        //Jos vain yksi tili kortilla niin tähän logiikka suoraan tilinhallintaan ilman tilinvalintaa?
 
         //avaa pienen viiveen jälkeen tilinvalintaruudun
         selectTimer = new QTimer(this);
