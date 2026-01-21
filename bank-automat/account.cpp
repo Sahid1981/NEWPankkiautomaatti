@@ -1,9 +1,44 @@
 #include "account.h"
 #include "ui_account.h"
 #include <qpainter.h>
+#include <cmath>
 
 #include <QStandardItemModel>
 
+bool account::isValidBillAmount(double amount) const
+{
+    // Must be whole euros
+    const double rounded = std::round(amount);
+    if (std::fabs(amount - rounded) > 1e-9) return false;
+    
+    const int euros = static_cast<int>(rounded);
+    if (euros < 20) return false;
+
+    // With 20€ and 50€ bills: valid amounts are multiples of 10, except 10 and 30
+    if (euros % 10 != 0) return false;
+    if (euros == 10 || euros == 30) return false;
+    
+    return true;
+}
+
+bool account::hasSufficientFunds(double amount) const
+{
+    if (cardtype == "debit") return amount <= saldo;
+    // credit: allow withdrawing up to remaining credit
+    return amount <= (creditlimit - saldo);
+}
+
+void account::showWithdrawError(QLabel *label, const QString &text, int ms)
+{
+    if (!label) return;
+    const QString original = label->text();
+    label->setText(text);
+    label->show();
+    QTimer::singleShot(ms, this, [label, original]() {
+        label->hide();
+        label->setText(original);
+    });
+}
 
 account::account(QString cardnumber, QString cardtype,QWidget *parent)
     : QWidget(parent)
@@ -224,30 +259,32 @@ void account::on_btnNosta100_clicked()
 
 void account::on_btnNostaMuu_clicked()
 {
-    //tarkistetaan että inputin saa pyöräytettyä doubleksi
     bool ok;
-    nostosumma =  ui->labelNostosumma->text().toDouble(&ok);
+    nostosumma = ui->labelNostosumma->text().toDouble(&ok);
     ui->labelNostosumma->setText("");
-    //joko onnistuu ja eteenpäin tai virheraportti näkyväksi
-    if (ok == false or nostosumma <= 0) {
-        ui->labelNostaValitseVirhe->show();
-        QTimer::singleShot(2000, this, [this]() {
-            ui->labelNostaValitseVirhe->hide(); // Piilottaa tekstin 2s päästä
-        });
+
+    if (!ok || nostosumma <= 0) {
+        showWithdrawError(ui->labelNostaValitseVirhe, "Virheellinen summa");
+        return;
     }
-    else if ((cardtype == "debit" and nostosumma > saldo) or (cardtype == "credit" and nostosumma > (creditlimit-saldo))) {
-        ui->labelNostaValitseVirhe->show();
-        ui->labelNostaValitseKate->show();
-        QTimer::singleShot(2000, this, [this]() {
-            ui->labelNostaValitseVirhe->hide(); // Piilottaa tekstin 2s päästä
-            ui->labelNostaValitseKate->hide();
-        });
+
+    // ATM supports only 20€ and 50€ bills.
+    if (!isValidBillAmount(nostosumma)) {
+        showWithdrawError(ui->labelNostaValitseVirhe, "Virheellinen summa (vain 20€ ja 50€)");
+        return;
     }
-    else {
-        ui->labelNostaValitseVirhe->hide();
-        ui->labelNostaVahvistaSumma->setText(QString::asprintf("%.2f €", nostosumma));
-        ui->stackedAccount->setCurrentWidget(ui->screenNostaVahvista);
+
+    // Check funds/credit.
+    if (!hasSufficientFunds(nostosumma)) {
+        showWithdrawError(ui->labelNostaValitseVirhe, "Virheellinen summa");
+        showWithdrawError(ui->labelNostaValitseKate, "Kate ei riitä");
+        return;
     }
+
+    ui->labelNostaValitseVirhe->hide();
+    ui->labelNostaValitseKate->hide();
+    ui->labelNostaVahvistaSumma->setText(QString::asprintf("%.2f €", nostosumma));
+    ui->stackedAccount->setCurrentWidget(ui->screenNostaVahvista);
 }
 
 void account::on_btnTapahtumatVasen_clicked()
