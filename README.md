@@ -30,6 +30,28 @@ API pyörii osoitteessa: `http://localhost:3000`
 - **PUT /users/:idUser** - Päivitä käyttäjän tiedot
 - **DELETE /users/:idUser** - Poista käyttäjä
 
+#### Kortit (Cards)
+
+- **POST /cards** - Luo uusi kortti (PIN hashataan bcryptillä)
+  ```json
+  {
+    "idCard": "CARD789012",
+    "idUser": "USER123",
+    "cardPIN": "1234"
+  }
+  ```
+- **GET /cards** - Hae kaikki kortit
+- **GET /cards/:idCard** - Hae kortti ID:llä
+- **PUT /cards/:idCard/pin** - Päivitä kortin PIN
+  ```json
+  {
+    "cardPIN": "5678"
+  }
+  ```
+- **DELETE /cards/:idCard** - Poista kortti
+- **POST /cards/:idCard/lock** - Lukitse kortti
+- **POST /cards/:idCard/unlock** - Avaa kortin lukitus
+
 #### Kortit ja Tilit (Cards & Accounts)
 
 - **GET /cardaccount/:idCard** - Hae kortin linkitetyt tilit
@@ -52,6 +74,29 @@ API pyörii osoitteessa: `http://localhost:3000`
   {
     "IdAccount": 1
   }
+  ```
+
+#### Logit (Logs)
+
+- **GET /log/:idAccount** - Hae tilin tapahtumalogit
+  - Palauttaa kaikki tilin tapahtumat uusimmasta vanhimpaan
+  - Esimerkki: `GET /log/1`
+  - Vastaus:
+  ```json
+  [
+    {
+      "idLog": 10,
+      "idAccount": 1,
+      "time": "2026-01-16T09:30:00.123000",
+      "balanceChange": -40.00
+    },
+    {
+      "idLog": 9,
+      "idAccount": 1,
+      "time": "2026-01-15T14:20:00.000000",
+      "balanceChange": 100.00
+    }
+  ]
   ```
 
 ### Backend status taulukko
@@ -79,6 +124,7 @@ mysql -u käyttäjä -p bank_db < seed.sql
 ## 3) Kortit
 ## 4) Transaktiot
 ## 5) Luottotili
+## 6) Tapahtumalogit
 
 #### Tietokannan hallinta
 
@@ -134,7 +180,35 @@ CALL sp_read_account_info(idaccount);
 
 #### Korttien hallinta
 
-**Kortin tietojen hakeminen (päivitetty)**
+**Kortin luominen**
+```sql
+-- Luo uuden kortin (PIN on jo hashattu backendissä)
+CALL sp_create_card(idcard, iduser, hashed_pin);
+-- Esimerkki: CALL sp_create_card('CARD789012', 'user123', '$2b$10$...');
+```
+
+**Kortin tietojen lukeminen**
+```sql
+-- Hakee kortin tiedot (ilman PIN:iä)
+CALL sp_read_card_info(idcard);
+-- Esimerkki: CALL sp_read_card_info('CARD123456');
+-- Palauttaa: idcard, iduser, is_locked
+```
+
+**Kaikkien korttien lukeminen**
+```sql
+-- Hakee kaikki kortit (ilman PIN:ejä)
+CALL sp_read_all_cards();
+```
+
+**Kortin PIN:in päivitys**
+```sql
+-- Päivittää kortin PIN:in (PIN on jo hashattu backendissä)
+CALL sp_update_card_pin(idcard, new_hashed_pin);
+-- Esimerkki: CALL sp_update_card_pin('CARD123456', '$2b$10$...');
+```
+
+**Kortin linkitettyjen tilien hakeminen**
 ```sql
 -- Hakee kortin linkitetyt tilit
 CALL sp_get_card_info(idcard);
@@ -228,6 +302,16 @@ CALL sp_credit_repay(idaccount, amount);
 -- Päivittää tilin luottorajan
 CALL sp_update_creditlimit(idaccount, creditlimit);
 -- Esimerkki: CALL sp_update_creditlimit(1, 2000.00);
+```
+
+#### Tapahtumalogit
+
+**Tilin lokien haku**
+```sql
+-- Hakee tilin kaikki tapahtumalogit uusimmasta vanhimpaan
+CALL sp_read_account_logs(idaccount);
+-- Esimerkki: CALL sp_read_account_logs(1);
+-- Palauttaa: idlog, idaccount, time, balancechange
 ```
 
 ### Database

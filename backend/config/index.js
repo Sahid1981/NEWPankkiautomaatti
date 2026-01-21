@@ -15,4 +15,6 @@ module.exports = {
     },
     // Tätä käytetään myöhemmin JWT-tokenien allekirjoittamiseen ja käyttäjän tunnistamiseen
     jwtSecret: process.env.JWT_SECRET || 'dev-secret',
+    // PIN pepper - lisäturvallisuus kortin PIN-koodille
+    pinPepper: process.env.PIN_PEPPER || '',
 };

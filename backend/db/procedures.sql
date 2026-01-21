@@ -316,7 +316,131 @@ DELIMITER ;
 -- KORTTIEN HALLINTA (Card Management)
 -- ========================================
 
--- GET CARD INFO
+-- CREATE CARD
+-- example CALL sp_create_card(idcard, iduser, hashed_pin);
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_create_card(
+  IN p_idcard VARCHAR(45),
+  IN p_iduser VARCHAR(45),
+  IN p_cardpin VARCHAR(255)
+)
+BEGIN
+  DECLARE v_card_exists INT;
+  DECLARE v_user_exists INT;
+
+  START TRANSACTION;
+
+  -- Check if card already exists
+  SELECT COUNT(*) INTO v_card_exists
+  FROM cards
+  WHERE idcard = p_idcard
+  FOR UPDATE;
+
+  IF v_card_exists > 0 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Card already exists';
+  END IF;
+
+  -- Check if user exists
+  SELECT COUNT(*) INTO v_user_exists
+  FROM users
+  WHERE iduser = p_iduser
+  FOR UPDATE;
+
+  IF v_user_exists = 0 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'User not found';
+  END IF;
+
+  -- Insert new card (PIN is already hashed by backend)
+  INSERT INTO cards (idcard, cardPIN, iduser, is_locked)
+  VALUES (p_idcard, p_cardpin, p_iduser, 0);
+
+  COMMIT;
+END$$
+DELIMITER ;
+
+-- READ CARD INFO
+-- example CALL sp_read_card_info(idcard);
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_read_card_info(
+  IN p_idcard VARCHAR(45)
+)
+BEGIN
+  DECLARE v_card_count INT;
+
+  -- Check if card exists
+  SELECT COUNT(*) INTO v_card_count
+  FROM cards
+  WHERE idcard = p_idcard;
+
+  IF v_card_count = 0 THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Card not found';
+  END IF;
+
+  -- Return card info (without PIN for security)
+  SELECT idcard, iduser, is_locked
+  FROM cards
+  WHERE idcard = p_idcard;
+END$$
+DELIMITER ;
+
+-- READ ALL CARDS
+-- example CALL sp_read_all_cards();
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_read_all_cards()
+BEGIN
+  -- Return all cards (without PINs for security)
+  SELECT idcard, iduser, is_locked
+  FROM cards;
+END$$
+DELIMITER ;
+
+-- UPDATE CARD PIN
+-- example CALL sp_update_card_pin(idcard, new_hashed_pin);
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_update_card_pin(
+  IN p_idcard VARCHAR(45),
+  IN p_new_cardpin VARCHAR(255)
+)
+BEGIN
+  DECLARE v_card_count INT;
+
+  START TRANSACTION;
+
+  -- Check if card exists
+  SELECT COUNT(*) INTO v_card_count
+  FROM cards
+  WHERE idcard = p_idcard
+  FOR UPDATE;
+
+  IF v_card_count = 0 THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Card not found';
+  END IF;
+
+  -- Update PIN (already hashed by backend)
+  UPDATE cards
+  SET cardPIN = p_new_cardpin
+  WHERE idcard = p_idcard;
+
+  COMMIT;
+END$$
+DELIMITER ;
+
+-- GET CARD INFO (with linked accounts)
 -- example CALL sp_get_card_info(idcard);
 
 DELIMITER $$
@@ -917,6 +1041,36 @@ BEGIN
   WHERE idaccount = p_idaccount;
   
   COMMIT;
+END$$
+DELIMITER ;
+
+-- ========================================
+-- TAPAHTUMALOGIT (Transaction Logs)
+-- ========================================
+
+-- READ ACCOUNT LOGS
+-- example CALL sp_read_account_logs(1);
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_read_account_logs(IN p_idaccount INT)
+BEGIN
+  DECLARE v_account_count INT;
+  
+  -- Check if account exists
+  SELECT COUNT(*) INTO v_account_count
+  FROM accounts
+  WHERE idaccount = p_idaccount;
+  
+  IF v_account_count = 0 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account not found';
+  END IF;
+  
+  -- Return logs ordered by most recent first
+  SELECT idlog, idaccount, time, balancechange
+  FROM log
+  WHERE idaccount = p_idaccount
+  ORDER BY time DESC;
 END$$
 DELIMITER ;
 
