@@ -269,13 +269,13 @@ void account::on_btnNostaMuu_clicked()
         return;
     }
 
-    // ATM supports only 20€ and 50€ bills.
+    // ATM supports only 20€ and 50€ bills
     if (!isValidBillAmount(nostosumma)) {
         showWithdrawError(ui->labelNostaValitseVirhe, "Virheellinen summa (vain 20€ ja 50€)");
         return;
     }
 
-    // Check funds/credit.
+    // Check funds/credit
     if (!hasSufficientFunds(nostosumma)) {
         showWithdrawError(ui->labelNostaValitseVirhe, "Virheellinen summa");
         showWithdrawError(ui->labelNostaValitseKate, "Kate ei riitä");
