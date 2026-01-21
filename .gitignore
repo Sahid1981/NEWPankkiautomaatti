@@ -5,3 +5,4 @@ node_modules/
 .qtcreator/
 .env
 backend/logs/
+.github/*.md

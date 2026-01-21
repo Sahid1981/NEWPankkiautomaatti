@@ -8,10 +8,10 @@ const router = express.Router();
 const { getCardAccountById, createCardAccount, updateCardAccount, deleteCardAccount} = require('../controllers/cardaccountcontroller');
 
 // Route definitions
-router.get('/:idCard', getCardAccountById); // READ - Reads the account(s) that cards are linked to
-router.post('/', createCardAccount); // CREATE - Links a card to an account
-router.put('/:idCard', updateCardAccount); // UPDATE - Updates card to different account
-router.delete('/:idCard', deleteCardAccount); // DELETE - Deletes the link between card and account
+router.get('/:idCard', getCardAccountById);         // READ - Reads the account(s) that cards are linked to
+router.post('/', createCardAccount);                // CREATE - Links a card to an account
+router.put('/:idCard', updateCardAccount);          // UPDATE - Updates card to different account
+router.delete('/:idCard', deleteCardAccount);       // DELETE - Deletes the link between card and account
 
 // Router export
 module.exports = router;

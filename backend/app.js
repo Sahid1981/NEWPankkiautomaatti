@@ -9,8 +9,10 @@ var logger = require('morgan');
 // Reittien tuonti
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var cardsRouter = require('./routes/cards');
 var cardsaccountsRouter = require('./routes/cardaccount');
 var accountsRouter = require('./routes/accounts');
+var logRouter = require('./routes/log');
 
 // Express-sovelluksen tuonti
 var app = express();
@@ -26,8 +28,10 @@ oletuksena */
 // Reittien kytkentä
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 app.use('/cardaccount', cardsaccountsRouter);
 app.use('/accounts', accountsRouter);
+app.use('/log', logRouter);
 
 // 404-handler
 app.use((req, res, next) => {
