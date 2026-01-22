@@ -44,6 +44,7 @@ private:
     void showWithdrawError(QLabel *label, const QString &text, int ms = 2000);
 
     void applySaldoTextColors();
+    void applyWithdrawConfirmStyle();
 
 protected:
     void paintEvent(QPaintEvent *event) override;

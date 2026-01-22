@@ -80,6 +80,14 @@ void account::applySaldoTextColors()
     setLabelColor(ui->labelSaldoLuottoaJaljella, luottoColor);
 }
 
+// Asettaa noston vahvistusnäytön summalabelin tyylin (väri tms.)
+// Kutsutaan aina ennen siirtymistä screenNostaVahvista -näkymään
+void account::applyWithdrawConfirmStyle()
+{
+    // Varmistetaan että teksti näkyy valkoisella taustalla
+    setLabelColor(ui->labelNostaVahvistaSumma, "#000000");
+}
+
 account::account(QString cardnumber, QString cardtype,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::account),
@@ -119,8 +127,13 @@ account::account(QString cardnumber, QString cardtype,QWidget *parent)
         "qproperty-alignment: 'AlignRight';"
         "border: 5px solid #7FABC4;"
         "border-radius: 15px;"
-        "background-color: white;"
-        );
+        "background: white;" // Tausta piirretään stylesheetin kautta
+        "color: #000000;" // Musta teksti valkoista taustaa vasten
+        "padding: 6px;"
+    );
+    // Pakottaa Qt:n piirtämään widgetin taustan stylesheetin mukaisesti
+    // Tämä on tärkeää, koska ilman tätä QLabel voi jäädä läpinäkyväksi
+    ui->labelNostaVahvistaSumma->setAttribute(Qt::WA_StyledBackground, true);
 
     //testidataa taulua varten
     testData = R"([
@@ -273,6 +286,8 @@ void account::on_btnNosta20_clicked()
 {
     nostosumma = 20;
     ui->labelNostaVahvistaSumma->setText(QString::asprintf("%.2f €", nostosumma));
+    // Asetetaan vahvistusnäkymän tekstivärit ennen näkymän vaihtoa
+    applyWithdrawConfirmStyle();
     ui->stackedAccount->setCurrentWidget(ui->screenNostaVahvista);
 }
 
@@ -281,6 +296,7 @@ void account::on_btnNosta40_clicked()
 {
     nostosumma = 40;
     ui->labelNostaVahvistaSumma->setText(QString::asprintf("%.2f €", nostosumma));
+    applyWithdrawConfirmStyle();
     ui->stackedAccount->setCurrentWidget(ui->screenNostaVahvista);
 }
 
@@ -289,6 +305,7 @@ void account::on_btnNosta50_clicked()
 {
     nostosumma = 50;
     ui->labelNostaVahvistaSumma->setText(QString::asprintf("%.2f €", nostosumma));
+    applyWithdrawConfirmStyle();
     ui->stackedAccount->setCurrentWidget(ui->screenNostaVahvista);
 }
 
@@ -297,6 +314,7 @@ void account::on_btnNosta100_clicked()
 {
     nostosumma = 100;
     ui->labelNostaVahvistaSumma->setText(QString::asprintf("%.2f €", nostosumma));
+    applyWithdrawConfirmStyle();
     ui->stackedAccount->setCurrentWidget(ui->screenNostaVahvista);
 }
 
@@ -329,6 +347,7 @@ void account::on_btnNostaMuu_clicked()
     ui->labelNostaValitseVirhe->hide();
     ui->labelNostaValitseKate->hide();
     ui->labelNostaVahvistaSumma->setText(QString::asprintf("%.2f €", nostosumma));
+    applyWithdrawConfirmStyle();
     ui->stackedAccount->setCurrentWidget(ui->screenNostaVahvista);
 }
 
