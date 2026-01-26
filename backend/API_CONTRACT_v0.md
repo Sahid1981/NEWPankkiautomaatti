@@ -1,87 +1,28 @@
-# Bank-ATM API – Contract v0
+# API Contract v1 – Bank ATM REST API
 
-## 0. Metatiedot
-- **Nimi:** Bank-ATM REST API
-- **Versio:** v0
+## Yleistä
+
+- **Versio:** v1
 - **Base URL:** `localhost:3000`
-- **Content-Type:** `application/json; charset=utf-8`
-- **Auth:** JWT (`Authorization: Bearer <token>`)
-- **Virhevastauksen muoto (yhtenäinen):**
+- **Content-Type:** `application/json`
+- **Autentikointi:** JWT (`Authorization: Bearer <token>`)
+- **Tietokanta:** MySQL (InnoDB)
+- **Aikamuodot:** MySQL `timestamp(6)`
+
+### Yhtenäinen virhemuoto
 ```json
 {
-  "error": "ErrorName",
+  "error": "Error",
   "message": "Human readable message",
-  "stack": "optional in non-production"
+  "stack": "Dev-only stacktrace"
 }
 ```
 
-## 1. Statuskoodit
+## Autentikointi
 
-| Koodi | Selitys               |
-| ----- | --------------------- |
-| 200   | OK                    |
-| 201   | Created               |
-| 204   | No Content            |
-| 400   | Bad Request           |
-| 401   | Unauthorized          |
-| 403   | Forbidden             |
-| 404   | Not Found             |
-| 409   | Conflict              |
-| 500   | Internal Server Error |
-
-## 2. Tietomallit
-
-### User
-
-```json
-{
-  "idUser": "TESTUSER1",
-  "firstName": "Testi",
-  "lastName": "Asiakas",
-  "streetAddress": "Testikatu 1"
-}
-```
-
-### Card
-
-```json
-{
-  "idCard": "CARD123456",
-  "idUser": "TESTUSER1",
-  "isLocked": false
-}
-```
-> PIN:tä ei koskaan palauteta API:sta. PIN tallennetaan hashattuna.
-
-### Account
-
-```json
-{
-  "idAccount": 1,
-  "idUser": "TESTUSER1",
-  "balance": 500.00,
-  "creditLimit": 0.00,
-  "type": "debit"
-}
-```
-
-### LogEntry
-
-```json
-{
-  "idLog": 10,
-  "idAccount": 1,
-  "time": "2026-01-16T09:30:00.123Z",
-  "balanceChange": -40.00
-}
-```
-
-## 3. Autentikointi
-
-### 3.1 Kirjautuminen (kortti + PIN)
+### Login
 
 #### POST `/auth/login`
-
 ```json
 {
   "idCard": "CARD123456",
@@ -93,225 +34,260 @@
 
 ```json
 {
-  "token": "jwt...",
+  "token": "jwt-token",
   "card": {
     "idCard": "CARD123456",
     "idUser": "TESTUSER1",
     "isLocked": false
   },
   "accounts": [
-    { "idAccount": 1, "type": "debit", "balance": 500.00, "creditLimit": 0.00 },
-    { "idAccount": 2, "type": "credit", "balance": 100.00, "creditLimit": 2000.00 }
+    {
+      "idAccount": 14,
+      "type": "debit",
+      "balance": 500.00,
+      "creditLimit": 0.00
+    }
   ],
-  "requiresAccountSelection": true
+  "requiresAccountSelection": false
 }
 ```
 
-### 3.2 Tilin valinta (kaksoiskortti)
-
-#### POST `/auth/select-account`
-
-```json
-{
-  "idAccount": 1
-}
-```
-
-#### 200 OK
-
-```json
-{
-  "activeAccount": {
-    "idAccount": 1,
-    "type": "debit"
-  }
-}
-```
-
-### 3.3 Logout
+### Logout
 
 #### POST `/auth/logout` → 204 No Content
 
-## 4. ATM-toiminnot
+## Users (Customers) – CRUD (Admin)
 
-### 4.1 Saldon haku
+### Create user
+
+#### POST `/users`
+
+```json
+{
+  "idUser": "test123",
+  "firstName": "Testi",
+  "lastName": "Käyttäjä",
+  "streetAddress": "Testikatu 1"
+}
+```
+
+### Read user
+
+#### GET `/users/{idUser}`
+
+### Update user
+
+#### PUT `/users/{idUser}`
+
+```json
+{
+  "firstName": "Testi2",
+  "lastName": "Käyttäjä2",
+  "streetAddress": "Uusikatu 99"
+}
+```
+
+### Delete user
+
+#### DELETE `/users/{idUser}` → 204
+
+## Accounts – CRUD (Admin)
+
+### Create account
+
+#### POST `/accounts`
+
+```json
+{
+  "idUser": "test123",
+  "balance": 1000.00,
+  "creditLimit": 0.00
+}
+```
+
+### Read account
 
 #### GET `/accounts/{idAccount}`
 
-```json
-{
-  "idAccount": 1,
-  "balance": 480.00,
-  "creditLimit": 0.00,
-  "type": "debit"
-}
-```
+### Update account
 
-### 4.2 Tilitapahtumat
-
-#### GET `/accounts/{idAccount}/logs?limit=20&cursor=10`
+#### PUT `/accounts/{idAccount}`
 
 ```json
 {
-  "items": [
-    {
-      "idLog": 12,
-      "time": "2026-01-16T09:30:00.123Z",
-      "balanceChange": -20.00
-    }
-  ],
-  "nextCursor": 12
+  "creditLimit": 500.00
 }
 ```
 
-### 4.3 Nosto (debit)
+### Delete account
 
-#### POST /accounts/{idAccount}/withdraw
+#### DELETE `/accounts/{idAccount}` → 204 / 409
 
-```json
-{ "amount": 40.00 }
-```
+## Cards – CRUD (Admin)
 
-#### 200 OK
+> PIN tallennetaan hashattuna (`cardPIN`), eikä koskaan palauteta API:ssa.
 
-```json
-{
-  "idAccount": 1,
-  "balance": 440.00,
-  "logged": true
-}
-```
-
-### 4.4 Talletus
-
-#### POST `/accounts/{idAccount}/deposit`
-
-```json
-{ "amount": 100.00 }
-```
-
-### 4.5 Tilisiirto
-
-#### POST `/accounts/transfer`
-
-```json
-{
-  "fromIdAccount": 1,
-  "toIdAccount": 2,
-  "amount": 75.00
-}
-```
-
-## 5. Credit-toiminnot
-
-### 5.1 Credit nosto
-
-#### POST `/accounts/{idAccount}/credit/withdraw`
-
-```json
-{ "amount": 200.00 }
-```
-
-### 5.2 Credit takaisinmaksu
-
-#### POST `/accounts/{idAccount}/credit/repay`
-
-```json
-{ "amount": 150.00 }
-```
-
-## 6. Kortit
-
-### Lukitse kortti
-
-#### POST `/cards/{idCard}/lock` → 204
-
-### Avaa lukitus
-
-#### POST `/cards/{idCard}/unlock` → 204
-
-### Luo kortti
+### Create card
 
 #### POST `/cards`
 
 ```json
 {
   "idCard": "CARD999",
-  "idUser": "TESTUSER1",
+  "idUser": "test123",
   "pin": "1234"
 }
 ```
 
-### Linkitä kortti tiliin
+### Read card
 
-#### POST `/cards/{idCard}/accounts`
+#### GET `/cards/{idCard}`
 
-```json
-{ "idAccount": 2 }
-```
+### Update card
 
-## 7. Käyttäjät (CRUD)
-
-### Luo käyttäjä
-
-#### POST `/users`
+#### PUT `/cards/{idCard}`
 
 ```json
 {
-  "idUser": "user123",
-  "firstName": "Matti",
-  "lastName": "Meikäläinen",
-  "streetAddress": "Meikatie 1"
+  "isLocked": true,
+  "pin": "0000"
 }
 ```
 
-### Hae käyttäjä
+### Delete card
 
-#### GET `/users/{idUser}`
+#### DELETE `/cards/{idCard}` → 204 / 409
 
-### Päivitä käyttäjä
+## Accounts ↔ Cards (Linkkitaulu) – CRUD
 
-#### PATCH `/users/{idUser}`
+### Create link
 
-```json
-{ "streetAddress": "Uusi osoite 5" }
-```
-
-### Poista käyttäjä
-
-#### DELETE `/users/{idUser}` → 204
-
-## 8. Tilit (CRUD)
-
-### Luo tili
-
-#### POST `/accounts`
+#### POST `/accounts-cards`
 
 ```json
 {
-  "idUser": "user123",
-  "balance": 1000.00,
-  "creditLimit": 500.00
+  "idAccount": 1,
+  "idCard": "CARD999"
 }
 ```
 
-### Poista tili
+### Read all links
 
-#### DELETE `/accounts/{idAccount}` → 204
+#### GET `/accounts-cards`
 
-## 9. Lokit
+### Read by account
 
-### Hae yksittäinen loki
+#### GET `/accounts-cards/account/{idAccount}`
+
+### Read by card
+
+#### GET `/accounts-cards/card/{idCard}`
+
+### Delete link
+
+#### DELETE `/accounts-cards`
+
+```json
+{
+  "idAccount": 1,
+  "idCard": "CARD999"
+}
+```
+
+## Logs – CRUD (Admin / Debug)
+
+### Create log
+
+#### POST `/logs`
+
+```json
+{
+  "idAccount": 1,
+  "balanceChange": -20.00
+}
+```
+
+### Read all logs
+
+#### GET `/logs`
+
+### Read log
 
 #### GET `/logs/{idLog}`
 
-### Poista loki (admin)
+### Update log
+
+#### PUT `/logs/{idLog}`
+
+```json
+{
+  "balanceChange": -25.00
+}
+```
+
+### Delete log
 
 #### DELETE `/logs/{idLog}` → 204
 
-## 10. Huomioita
+## ATM-toiminnot (User)
 
-- Saldoa saa muuttaa vain transaktio-endpointeilla
-- Kaikki nostot/talletukset luovat logimerkinnän
-- Kaksoiskortti vaatii tilin valinnan
-- PIN käsitellään vain hashattuna
+### Get balance
+
+#### GET `/atm/balance`
+
+### Withdraw
+
+#### POST `/atm/withdraw`
+
+```json
+{
+  "amount": 40.00
+}
+```
+
+### Deposit
+
+#### POST `/atm/deposit`
+
+```json
+{
+  "amount": 100.00
+}
+```
+
+### Transfer
+
+#### POST `/atm/transfer`
+
+```json
+{
+  "toAccount": 2,
+  "amount": 75.00
+}
+```
+
+## Roolit
+
+- **User**
+   - ATM-toiminnot
+   - Omat tilit ja saldot
+- **Admin**
+   - Kaikki CRUD-endpointit
+   - Käyttäjät, tilit, kortit, linkitykset, lokit
+
+## Versiohistoria
+
+- **v0** – Alkuperäinen API-sopimus
+- **v1** – CRUD kaikille tauluille + autentikointi + ATM-toiminnot + roolit
+
+## Testaus
+
+Kaikki endpointit on testattu Postmanilla kokoelmassa:
+
+### CRUD demo
+
+- Users
+- Accounts
+- Cards
+- Accounts_Cards
+- Logs
