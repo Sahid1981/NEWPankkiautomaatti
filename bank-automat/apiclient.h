@@ -12,6 +12,7 @@
 #include <QNetworkRequest>
 #include <QUrl>
 #include <QJsonObject>
+#include <QJsonDocument>
 #include <QVector>
 #include <QString>
 

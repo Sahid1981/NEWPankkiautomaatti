@@ -137,6 +137,24 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
             emit loginSucceeded(out);
         }
 
+        // Special-case handling for withdraw responses (debit and credit)
+        // Expected backend response example:
+        // { "idAccount": 14, "balance": 460.00, "logged": true, ... }
+        if (path.endsWith("/withdraw")) {
+            const QJsonObject o = doc.object();
+
+            // Prefer idAccount from JSON; fallback to parsing from URL: "/atm/{id}/withdraw" or "/atm/{id}/credit/withdraw"
+            int idAccount = o.value("idAccount").toInt();
+            if (idAccount <= 0) {
+                idAccount = path.section('/', 2, 2).toInt();
+            }
+
+            // Prefer balance from JSON; if missing, use 0.0 (or consider treating as contract error)
+            const double newBalance = o.value("balance").toDouble();
+
+            emit withdrawSucceeded(idAccount, newBalance);
+        }
+
         reply->deleteLater();
     });
 }
