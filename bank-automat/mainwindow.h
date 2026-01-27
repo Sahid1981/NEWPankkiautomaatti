@@ -1,49 +1,41 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "accountselect.h"
 #include <QMainWindow>
 #include <QTimer>
 
+#include "apiclient.h"
+#include "accountselect.h"
+
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
+namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
-public:
-    MainWindow(QWidget *parent = nullptr);
+    
+    public:
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-private:
-    Ui::MainWindow *ui;
-
-    //käytetään aloitusruudun näyttämiseen
-    QTimer *splashTimer;
-    bool isSplashScreen;
-
-    //select ruudulle siirtymisen timer ja username
-    QTimer *selectTimer;
-    accountselect *accountSelectWindow;
-    QString username;
-
-    //näyttää tai piilottaa pääruudun tekstit ja napit
-    void setMainControlsVisible(bool visible);
-
-    //testi tunnukset
-    const QString VALID_USERNAME = "user";
-    const QString VALID_PASSWORD = "pass";
-
-private slots:
+    
+    protected:
+    void paintEvent(QPaintEvent *event) override;
+    
+    private slots:
     void showMainScreen();
     void on_KirjauduButton_clicked();
-    void openSelectWindow();
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
+    
+    private:
+    Ui::MainWindow *ui;
+    
+    bool isSplashScreen;
+    QTimer *splashTimer;
+    
+    ApiClient* api = nullptr;
+    accountselect* accountSelectWindow = nullptr;
+    
+    void setMainControlsVisible(bool visible);
 };
-#endif // MAINWINDOW_H
+
+#endif

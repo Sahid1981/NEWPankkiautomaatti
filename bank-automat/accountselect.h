@@ -1,34 +1,42 @@
 #ifndef ACCOUNTSELECT_H
 #define ACCOUNTSELECT_H
 
-#include "account.h"
 #include <QDialog>
 
+#include "apiclient.h"
+
 namespace Ui {
-class accountselect;
+    class accountselect;
 }
 
 class accountselect : public QDialog
 {
     Q_OBJECT
-
-public:
-    explicit accountselect(QString message, QWidget *parent = nullptr);
+    
+    public:
+    explicit accountselect(
+        const LoginResultDto& loginResult,
+        ApiClient* api,
+        QWidget *parent = nullptr
+    );
     ~accountselect();
-
-private:
-    Ui::accountselect *ui;
-    QString cardnumber;
-    QString cardtype;
-    account *accountWindow;
-
-private slots:
-    void openAccountWindow();
-    void on_btnSelectCredit_clicked();
-    void on_btnSelectDebit_clicked();
-
-protected:
+    
+    protected:
     void paintEvent(QPaintEvent *event) override;
+    
+    private slots:
+    void on_btnSelectDebit_clicked();
+    void on_btnSelectCredit_clicked();
+    
+    private:
+    Ui::accountselect *ui;
+    
+    ApiClient* m_api;
+    LoginResultDto m_login;
+    
+    QString selectedAccountType;
+    
+    void openAccountWindow();
 };
 
-#endif // ACCOUNTSELECT_H
+#endif

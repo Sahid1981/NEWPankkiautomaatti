@@ -1,48 +1,59 @@
 #include "mainwindow.h"
-#include <QAction>
-#include <QDebug>
-#include <QFile>
-#include <QLineEdit>
-#include <QPainter>
-#include <QPixmap>
-#include <QStyle>
 #include "ui_mainwindow.h"
 
+#include <QPainter>
+#include <QPixmap>
+#include <QLineEdit>
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-    , isSplashScreen(true)
+: QMainWindow(parent)
+, ui(new Ui::MainWindow)
+, isSplashScreen(true)
 {
     ui->setupUi(this);
+    
+    api = new ApiClient(this);
+    api->setBaseUrl(QUrl("http://127.0.0.1:3000"));
 
-    // lisää mahdollisuus painaa enteriä kirjautumiseen
-    connect(ui->user, &QLineEdit::returnPressed, this, &MainWindow::on_KirjauduButton_clicked);
-    connect(ui->password, &QLineEdit::returnPressed, this, &MainWindow::on_KirjauduButton_clicked);
-
-    // Lisää salasanakentälle näytä/piilota nappi
-    QIcon showIcon(":/images/silmaa.svg");
-    QIcon hideIcon(":/images/silmak.svg");
-
-    QAction *toggleAction = ui->password->addAction(showIcon, QLineEdit::TrailingPosition);
-    toggleAction->setCheckable(true);
-
-    connect(toggleAction, &QAction::toggled, [this, toggleAction, showIcon, hideIcon](bool checked) {
-        if (checked) {
-            ui->password->setEchoMode(QLineEdit::Normal);
-            toggleAction->setIcon(hideIcon);
-        } else {
-            ui->password->setEchoMode(QLineEdit::Password);
-            toggleAction->setIcon(showIcon);
+    connect(api, &ApiClient::loginSucceeded, this,
+        [this](const LoginResultDto& loginResult)
+        {
+            ui->errorLabel->setVisible(false);
+            
+            accountSelectWindow = new accountselect(loginResult, api, nullptr);
+            accountSelectWindow->setAttribute(Qt::WA_DeleteOnClose);
+            accountSelectWindow->showMaximized();
+            
+            this->close();
         }
-    });
-
-    //piilota pääruudun tekstit ja napit aluksi
-    setMainControlsVisible(false);
-
-    // ajastin alku logolle
-    splashTimer = new QTimer(this);
-    connect(splashTimer, &QTimer::timeout, this, &MainWindow::showMainScreen);
-    splashTimer->start(3000);
+    );
+    
+    connect(api, &ApiClient::requestFailed, this,
+        [this](const ApiError& error)
+        {
+            ui->errorLabel->setText(
+                error.message.isEmpty()
+                ? "Kirjautuminen epäonnistui"
+                : error.message
+            );
+            ui->errorLabel->setVisible(true);
+            
+            ui->password->clear();
+            ui->password->setFocus();
+        }
+    );
+    
+    connect(ui->user, &QLineEdit::returnPressed,
+        this, &MainWindow::on_KirjauduButton_clicked);
+        connect(ui->password, &QLineEdit::returnPressed,
+            this, &MainWindow::on_KirjauduButton_clicked);
+            
+            setMainControlsVisible(false);
+            
+            splashTimer = new QTimer(this);
+            connect(splashTimer, &QTimer::timeout,
+                this, &MainWindow::showMainScreen);
+                splashTimer->start(3000);
 }
 
 MainWindow::~MainWindow()
@@ -52,67 +63,43 @@ MainWindow::~MainWindow()
 
 void MainWindow::showMainScreen()
 {
-    isSplashScreen = false;
     splashTimer->stop();
-    //näyttää login ruudun labelit ja napit ja siirtää kursorin käyttäjä kenttään
+    isSplashScreen = false;
     setMainControlsVisible(true);
-    ui->user->setFocus();
-    // Päivittää näkymän
     update();
 }
 
 void MainWindow::setMainControlsVisible(bool visible)
 {
     ui->loginCard->setVisible(visible);
-}
-
-void MainWindow::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event);
-    QPainter painter(this);
-
-    if (isSplashScreen) {
-        // Näytä aloitusruudun tausta
-        static const QPixmap splashPix(":/images/background.png");
-        painter.drawPixmap(rect(), splashPix);
-
-    } else {
-        // Näytä pääruudun tausta
-        static const QPixmap mainPix(":/images/backgroundLogin.png");
-        painter.drawPixmap(rect(), mainPix);
+    
+    ui->errorLabel->setVisible(false);
+    
+    if (visible) {
+        ui->user->setFocus();
     }
 }
 
 void MainWindow::on_KirjauduButton_clicked()
 {
-    ui->errorLabel->setVisible(false); // piilota vanha virhe
-
-    username = ui->user->text().trimmed();
-    QString password = ui->password->text();
-
-    // Testaa kovakoodatut tunnukset
-    if (username == VALID_USERNAME && password == VALID_PASSWORD) {
-        ui->errorLabel->setVisible(false);
-        selectTimer = new QTimer(this);
-        connect(selectTimer, &QTimer::timeout, this, &MainWindow::openSelectWindow);
-        selectTimer->setSingleShot(true);
-        selectTimer->start(1000);
-    } else {
-        ui->errorLabel->setText("Virheellinen käyttäjätunnus tai salasana");
-        ui->errorLabel->setVisible(true);
-
-        ui->password->clear();
-        ui->password->setFocus();
-    }
+    ui->errorLabel->setVisible(false);
+    
+    const QString idCard = ui->user->text().trimmed();
+    const QString pin    = ui->password->text().trimmed();
+    
+    api->login(idCard, pin);
 }
 
-//tilinvalintaruudun avaaminen
-void MainWindow::openSelectWindow()
+void MainWindow::paintEvent(QPaintEvent *)
 {
-    accountSelectWindow = new accountselect(username, nullptr);
-    //nulpptr niin voidaan mainwindow sammuttaa ja accountselect säilyy
-    accountSelectWindow->setAttribute(Qt::WA_DeleteOnClose);
-    //Lisätään että muisti vapautetaan oikein suljettaessa, koska nullptr käytössä
-    accountSelectWindow->showMaximized();
-    this->close();      //suljetaan mainWindow
+    QPainter painter(this);
+    
+    QPixmap bg;
+    if (isSplashScreen) {
+        bg.load(":/images/background.png");
+    } else {
+        bg.load(":/images/backgroundLogin.png");
+    }
+    
+    painter.drawPixmap(rect(), bg);
 }

@@ -1,19 +1,23 @@
 #include "accountselect.h"
-#include "account.h"
 #include "ui_accountselect.h"
+#include "account.h"
+
 #include <QPainter>
 #include <QPixmap>
 
-
-accountselect::accountselect(QString username, QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::accountselect)
-    , cardnumber(username)
+accountselect::accountselect(
+    const LoginResultDto& loginResult,
+    ApiClient* api,
+    QWidget *parent
+)
+: QDialog(parent)
+, ui(new Ui::accountselect)
+, m_api(api)
+, m_login(loginResult)
 {
     ui->setupUi(this);
-
-    // Näytetään kirjautunut käyttäjä siististi
-    ui->labelTest->setText("Käyttäjä: " + username);
+    
+    ui->labelTest->setText("Käyttäjä: " + m_login.idUser);
 }
 
 accountselect::~accountselect()
@@ -21,32 +25,30 @@ accountselect::~accountselect()
     delete ui;
 }
 
-void accountselect::on_btnSelectCredit_clicked()
+void accountselect::on_btnSelectDebit_clicked()
 {
-    cardtype = "credit";
+    selectedAccountType = "debit";
     openAccountWindow();
 }
 
-void accountselect::on_btnSelectDebit_clicked()
+void accountselect::on_btnSelectCredit_clicked()
 {
-    cardtype = "debit";
+    selectedAccountType = "credit";
     openAccountWindow();
 }
 
 void accountselect::openAccountWindow()
 {
-    accountWindow = new account(cardnumber, cardtype, nullptr);
-    //nulpptr niin voidaan accountselectwindow sammuttaa ja account säilyy
+    account* accountWindow = new account(m_login.idCard, selectedAccountType, nullptr);
     accountWindow->setAttribute(Qt::WA_DeleteOnClose);
-    //Lisätään että muisti vapautetaan oikein suljettaessa, koska nullptr käytössä
     accountWindow->showMaximized();
-    this->close();      //suljetaan accountSelectWindow
+    
+    this->close();
 }
 
-//valintaruudun tausta, sama kuin kirjautumissivulla
-void accountselect::paintEvent(QPaintEvent *event)
+void accountselect::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    static const QPixmap selectPix(":/images/backgroundLogin.png");
-    painter.drawPixmap(rect(), selectPix);
+    QPixmap bg(":/images/background.png");
+    painter.drawPixmap(rect(), bg);
 }
