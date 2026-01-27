@@ -17,7 +17,9 @@ export default defineConfig([
     },
     rules: {
       "no-console": "off",
-      "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }]
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "no-eval": "error",
+      "indent": ["warn", 4]
     }
   }
 ]);
