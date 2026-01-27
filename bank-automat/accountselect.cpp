@@ -23,8 +23,11 @@ accountselect::accountselect(
         accountIdByType[acc.type.toLower()] = acc.idAccount;
     }
     
-    ui->btnSelectDebit->setEnabled(accountIdByType.contains("debit"));
-    ui->btnSelectCredit->setEnabled(accountIdByType.contains("credit"));
+    const bool hasDebit  = accountIdByType.contains("debit");
+    const bool hasCredit = accountIdByType.contains("credit");
+    
+    ui->btnSelectDebit->setVisible(hasDebit);
+    ui->btnSelectCredit->setVisible(hasCredit);
 }
 
 accountselect::~accountselect()
