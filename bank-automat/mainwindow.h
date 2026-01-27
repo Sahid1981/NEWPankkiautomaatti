@@ -65,5 +65,4 @@ class MainWindow : public QMainWindow
     // Shows or hides the login controls
     void setMainControlsVisible(bool visible);
 };
-
-#endif
+#endif // MAINWINDOW_H

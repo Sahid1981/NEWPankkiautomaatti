@@ -65,4 +65,4 @@ class accountselect : public QDialog
     void openAccountWindow();
 };
 
-#endif
+#endif // ACCOUNTSELECT_H
