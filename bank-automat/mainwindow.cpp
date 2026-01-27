@@ -7,18 +7,24 @@
 - drawing the background image itself*/
 
 #include "mainwindow.h"
+#include <QAction>
+#include <QDebug>
+#include <QFile>
+#include <QLineEdit>
 #include "ui_mainwindow.h"
 
 #include <QPainter>
 #include <QPixmap>
+#include <QStyle>
+#include "ui_mainwindow.h"
 #include <QLineEdit>
 
 // MainWindow is the first window shown when the application starts
 // It displays a splash screen, then a login form and handles user authentication
 MainWindow::MainWindow(QWidget *parent)
-: QMainWindow(parent)
-, ui(new Ui::MainWindow)
-, isSplashScreen(true) // Start in splash screen mode
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+    , isSplashScreen(true) // Start in splash screen mode
 {
     // Initialize UI components created by Qt Designer
     ui->setupUi(this);

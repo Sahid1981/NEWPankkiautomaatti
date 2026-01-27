@@ -6,9 +6,8 @@
 - draws the background image manually */ 
 
 #include "accountselect.h"
-#include "ui_accountselect.h"
 #include "account.h"
-
+#include "ui_accountselect.h"
 #include <QPainter>
 #include <QPixmap>
 
