@@ -1,3 +1,12 @@
+## Backend CI/CD workflow
+## when pushed to main or pull request to main
+## runs 
+## - tests for api endpoints
+## - Linting for code style
+## - Audits dependencies for vulnerabilities
+## on success deploys to server via SSH
+## and restarts pm2 process
+
 name: backend CI
 
 on:
@@ -27,6 +36,9 @@ jobs:
 
             - name: Install dependencies
               run: npm ci
+            
+            - name: Security audit
+              run: npm audit --audit-level=moderate
 
             - name: Run tests
               run: npm test -- --ci
