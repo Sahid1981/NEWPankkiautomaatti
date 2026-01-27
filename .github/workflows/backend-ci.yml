@@ -6,6 +6,7 @@
 ## - Audits dependencies for vulnerabilities
 ## on success deploys to server via SSH
 ## and restarts pm2 process
+## remember to set secrets in repo settings
 
 name: backend CI
 
@@ -62,7 +63,7 @@ jobs:
               with:
                   host: ${{ secrets.SERVER_HOST }}
                   username: ${{ secrets.SERVER_USER }}
-                  key: ${{ secrets.cicd}}
+                  key: ${{ secrets.SSH_PRIVATE_KEY}}
                   script: |
                       cd /home/ubuntu/pankkiautomaatti/group_2/backend
                       git pull origin main
