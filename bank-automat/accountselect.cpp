@@ -49,16 +49,11 @@ void accountselect::on_btnSelectCredit_clicked()
 
 void accountselect::openAccountWindow()
 {
-    const int accountId = accountIdByType.value(selectedAccountType, -1);
-    if (accountId < 0) {
-        return;
-    }
+    const int idAccount = accountIdByType.value(selectedAccountType, -1);
+    if (idAccount < 0) return;
     
-    account* accountWindow = new account(
-        m_login.idCard,
-        selectedAccountType,
-        nullptr
-    );
+    account* accountWindow =
+    new account(idAccount, m_api, nullptr);
     
     accountWindow->setAttribute(Qt::WA_DeleteOnClose);
     accountWindow->showMaximized();
