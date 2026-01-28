@@ -40,9 +40,17 @@ void userdata::updateModel()
 
     for (int row = 0; row < userDataList.size(); row++) {
         const user &user = userDataList[row];
-        tableModel->setItem(row,0, new QStandardItem(user.iduser));
-        tableModel->setItem(row,1, new QStandardItem(user.fname));
-        tableModel->setItem(row,2, new QStandardItem(user.lname));
-        tableModel->setItem(row,3, new QStandardItem(user.streetaddress));
+        QStandardItem *idUserItem = new QStandardItem(user.iduser);
+        idUserItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+        tableModel->setItem(row,0, idUserItem);
+        QStandardItem *fNameItem = new QStandardItem(user.fname);
+        fNameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+        tableModel->setItem(row,1, fNameItem);
+        QStandardItem *lNameItem = new QStandardItem(user.lname);
+        lNameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+        tableModel->setItem(row,2, lNameItem);
+        QStandardItem *addressItem = new QStandardItem(user.streetaddress);
+        addressItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+        tableModel->setItem(row,3, addressItem);
     }
 }

@@ -21,9 +21,11 @@ private:
 
     class userdata *userData;
     class accountsdata *accountsData;
+    class carddata *cardData;
 
     QByteArray testUserData;
     QByteArray testAccountsData;
+    QByteArray testCardData;
 
 protected:
     void paintEvent(QPaintEvent *event) override;

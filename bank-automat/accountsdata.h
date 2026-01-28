@@ -13,7 +13,7 @@ class accountsdata : public QObject
 public:
     explicit accountsdata(QObject *parent = nullptr);
     void setAccountsData(const QByteArray &newAccountsData);
-     QStandardItemModel* getModel() const { return tableModel;};
+    QStandardItemModel* getModel() const { return tableModel;};
 
     void updateModel();
 

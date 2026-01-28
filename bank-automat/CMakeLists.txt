@@ -23,6 +23,8 @@ qt_add_executable(bank-automat
     userdata.h userdata.cpp
     accounts.h accounts.cpp
     accountsdata.h accountsdata.cpp
+    card.h card.cpp
+    carddata.h carddata.cpp
 
 
 
