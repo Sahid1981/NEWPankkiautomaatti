@@ -66,16 +66,13 @@ void accountselect::on_btnSelectCredit_clicked()
 void accountselect::openAccountWindow()
 {
     // Resolve account ID from the selected type
-    const int accountId = accountIdByType.value(selectedAccountType, -1);
-    if (accountId < 0) {
-        // Safety check: no valid account found
-        return;
-    }
-    
+    const int idAccount = accountIdByType.value(selectedAccountType, -1);
+    if (idAccount < 0) return;
+
     // Create the account window
     account* accountWindow = new account(
-        m_login.idCard,         // Card ID
-        selectedAccountType,    // "debit" or "credit"
+        idAccount,
+        m_api,
         nullptr
     );
     
