@@ -46,7 +46,7 @@
       <widget class="QFrame" name="frame">
        <property name="minimumSize">
         <size>
-         <width>1000</width>
+         <width>681</width>
          <height>700</height>
         </size>
        </property>
@@ -530,7 +530,7 @@
          <rect>
           <x>0</x>
           <y>610</y>
-          <width>1001</width>
+          <width>681</width>
           <height>91</height>
          </rect>
         </property>
@@ -670,13 +670,39 @@
           <string>Kortit</string>
          </property>
         </widget>
+        <widget class="QPushButton" name="btnLokitLowBar">
+         <property name="geometry">
+          <rect>
+           <x>380</x>
+           <y>20</y>
+           <width>101</width>
+           <height>51</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Lokit</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="btnLogOutLowBar_2">
+         <property name="geometry">
+          <rect>
+           <x>560</x>
+           <y>20</y>
+           <width>101</width>
+           <height>51</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Kirjaudu ulos</string>
+         </property>
+        </widget>
        </widget>
        <widget class="QStackedWidget" name="stackedAdmin">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>60</y>
-          <width>1001</width>
+          <width>681</width>
           <height>551</height>
          </rect>
         </property>
@@ -695,9 +721,9 @@
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>85</green>
-              <blue>255</blue>
+              <red>213</red>
+              <green>213</green>
+              <blue>213</blue>
              </color>
             </brush>
            </colorrole>
@@ -850,9 +876,9 @@
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>85</green>
-              <blue>255</blue>
+              <red>213</red>
+              <green>213</green>
+              <blue>213</blue>
              </color>
             </brush>
            </colorrole>
@@ -1005,9 +1031,9 @@
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>85</green>
-              <blue>255</blue>
+              <red>213</red>
+              <green>213</green>
+              <blue>213</blue>
              </color>
             </brush>
            </colorrole>
@@ -1150,7 +1176,7 @@
          </palette>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="screenTilit">
          <property name="palette">
@@ -1168,9 +1194,9 @@
             <colorrole role="Button">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>0</red>
-               <green>85</green>
-               <blue>255</blue>
+               <red>213</red>
+               <green>213</green>
+               <blue>213</blue>
               </color>
              </brush>
             </colorrole>
@@ -1323,9 +1349,9 @@
             <colorrole role="Button">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>0</red>
-               <green>85</green>
-               <blue>255</blue>
+               <red>213</red>
+               <green>213</green>
+               <blue>213</blue>
               </color>
              </brush>
             </colorrole>
@@ -1478,9 +1504,9 @@
             <colorrole role="Button">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>0</red>
-               <green>85</green>
-               <blue>255</blue>
+               <red>213</red>
+               <green>213</green>
+               <blue>213</blue>
               </color>
              </brush>
             </colorrole>
@@ -1622,19 +1648,6 @@
            </disabled>
           </palette>
          </property>
-         <widget class="QLabel" name="label">
-          <property name="geometry">
-           <rect>
-            <x>860</x>
-            <y>60</y>
-            <width>41</width>
-            <height>51</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Tilit</string>
-          </property>
-         </widget>
          <widget class="QTableView" name="tableAccountsData">
           <property name="geometry">
            <rect>
@@ -2114,21 +2127,95 @@
            </palette>
           </property>
          </widget>
-        </widget>
-        <widget class="QWidget" name="screenKortit">
-         <widget class="QLabel" name="label_3">
+         <widget class="QPushButton" name="btnTiliLuoUusi">
           <property name="geometry">
            <rect>
-            <x>830</x>
-            <y>50</y>
+            <x>540</x>
+            <y>20</y>
             <width>121</width>
             <height>51</height>
            </rect>
           </property>
           <property name="text">
-           <string>Kortit</string>
+           <string>Luo uusi tili</string>
           </property>
          </widget>
+         <widget class="QPushButton" name="btnTiliPaivitaLuottoraja">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>90</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Päivitä luottoraja</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnTiliPaivitaLuottoraja_2">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>480</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Poista tili</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="screenLokit">
+         <widget class="QTableView" name="tableLokit">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>20</y>
+            <width>501</width>
+            <height>511</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnLokitHae">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>70</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Hae lokit</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>20</y>
+            <width>41</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Tili ID: &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="labelTiliID">
+          <property name="geometry">
+           <rect>
+            <x>590</x>
+            <y>30</y>
+            <width>71</width>
+            <height>22</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="screenKortit">
          <widget class="QTableView" name="tableCardData">
           <property name="geometry">
            <rect>
@@ -2608,6 +2695,97 @@
            </palette>
           </property>
          </widget>
+         <widget class="QPushButton" name="btnKorttiLuoUusi">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>20</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Luo uusi kortti</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKorttiPaivitaPIN">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>90</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Päivitä PIN</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKorttiLukitse">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>160</y>
+            <width>51</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Lukitse</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKorttiAvaa">
+          <property name="geometry">
+           <rect>
+            <x>610</x>
+            <y>160</y>
+            <width>51</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Avaa</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKorttiPoista">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>480</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Poista kortti</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKorttiPaivitaLinkitys">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>230</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Päivitä linkitys</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKorttiPoistaLinkitys">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>300</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Poista linkitys</string>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="screenAsiakkaat">
          <property name="palette">
@@ -2625,9 +2803,9 @@
             <colorrole role="Button">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>0</red>
-               <green>85</green>
-               <blue>255</blue>
+               <red>213</red>
+               <green>213</green>
+               <blue>213</blue>
               </color>
              </brush>
             </colorrole>
@@ -2780,9 +2958,9 @@
             <colorrole role="Button">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>0</red>
-               <green>85</green>
-               <blue>255</blue>
+               <red>213</red>
+               <green>213</green>
+               <blue>213</blue>
               </color>
              </brush>
             </colorrole>
@@ -2935,9 +3113,9 @@
             <colorrole role="Button">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>0</red>
-               <green>85</green>
-               <blue>255</blue>
+               <red>213</red>
+               <green>213</green>
+               <blue>213</blue>
               </color>
              </brush>
             </colorrole>
@@ -3558,6 +3736,45 @@
            </palette>
           </property>
          </widget>
+         <widget class="QPushButton" name="btnKayttajaLuoUusi">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>20</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Luo uusi käyttäjä</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKayttajaPaivitaTietoja">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>90</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Päivitä tietoja</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnKayttajaPoista">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>480</y>
+            <width>121</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Poista Käyttäjä</string>
+          </property>
+         </widget>
         </widget>
        </widget>
        <widget class="QFrame" name="frame_2">
@@ -3565,7 +3782,7 @@
          <rect>
           <x>-1</x>
           <y>-1</y>
-          <width>1001</width>
+          <width>681</width>
           <height>61</height>
          </rect>
         </property>

@@ -3,6 +3,7 @@
 #include "carddata.h"
 #include "ui_adminwindow.h"
 #include "userdata.h"
+#include <QProcess>
 #include <qpainter.h>
 
 adminwindow::adminwindow(QString user, QWidget *parent)
@@ -13,6 +14,8 @@ adminwindow::adminwindow(QString user, QWidget *parent)
     ui->setupUi(this);
     ui->labelAdminUser->setText("Adminkäyttäjä: "+user);
     ui->stackedAdmin->setCurrentWidget(ui->screenAsiakkaat);
+
+    connect(ui->labelTiliID, &QLineEdit::returnPressed, this, &adminwindow::on_btnLokitHae_clicked);
 
     //testidataa
     testUserData = R"([
@@ -80,5 +83,29 @@ void adminwindow::on_btnTilitLowBar_clicked()
 void adminwindow::on_btnKortitLowBar_clicked()
 {
     ui->stackedAdmin->setCurrentWidget(ui->screenKortit);
+}
+
+
+void adminwindow::on_btnLokitHae_clicked()
+{
+
+}
+
+
+void adminwindow::on_btnLokitLowBar_clicked()
+{
+    ui->stackedAdmin->setCurrentWidget(ui->screenLokit);
+    ui->labelTiliID->setFocus();
+}
+
+
+void adminwindow::on_btnLogOutLowBar_2_clicked()
+{
+    //Hard reset
+    //StartDetached = kokonaan irtonainen, uusi sovellus
+    //applicationFilePath = Tämän sovelluksen sijainnista
+    //{} = startDetached function vaatii argumentit että ajaa oikein, annetaan tyhjä
+    QProcess::startDetached(QCoreApplication::applicationFilePath(), {});
+    qApp->quit();   //sulkee tämän version sovelluksesta
 }
 

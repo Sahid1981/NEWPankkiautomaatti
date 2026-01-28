@@ -33,6 +33,9 @@ private slots:
     void on_btnAsiakkaatLowBar_clicked();
     void on_btnTilitLowBar_clicked();
     void on_btnKortitLowBar_clicked();
+    void on_btnLokitHae_clicked();
+    void on_btnLokitLowBar_clicked();
+    void on_btnLogOutLowBar_2_clicked();
 };
 
 #endif // ADMINWINDOW_H
