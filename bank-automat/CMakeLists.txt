@@ -18,6 +18,10 @@ qt_add_executable(bank-automat
     account.h account.cpp account.ui
     logevents.h logevents.cpp
     logs.h logs.cpp
+    adminwindow.h adminwindow.cpp adminwindow.ui
+
+
+
 )
 
 target_link_libraries(bank-automat

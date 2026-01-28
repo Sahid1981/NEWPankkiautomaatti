@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "accountselect.h"
+#include "adminwindow.h"
 #include <QMainWindow>
 #include <QTimer>
 
@@ -26,9 +27,10 @@ private:
     QTimer *splashTimer;
     bool isSplashScreen;
 
-    //select ruudulle siirtymisen timer ja username
+    //select/admin ruudulle siirtymisen timer ja username
     QTimer *selectTimer;
     accountselect *accountSelectWindow;
+    adminwindow *adminLogIn;
     QString username;
 
     //näyttää tai piilottaa pääruudun tekstit ja napit
@@ -38,10 +40,15 @@ private:
     const QString VALID_USERNAME = "user";
     const QString VALID_PASSWORD = "pass";
 
+    //Admin testitunnukset
+    const QString VALID_ADMINUSER = "admin";
+    const QString VALID_ADMINPASS = "pass";
+
 private slots:
     void showMainScreen();
     void on_KirjauduButton_clicked();
     void openSelectWindow();
+    void openAdminWindow();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
