@@ -32,7 +32,7 @@ target_link_libraries(bank-automat
         Qt::Svg
         Qt::Network
 )
-
+include(CTest)
 add_test(NAME LoginTest COMMAND logintest)
 
 include(GNUInstallDirs)
