@@ -14,16 +14,25 @@ jobs:
         defaults:
             run:
                 working-directory: ./bank-automat
+        
+        env:
+        BACKEND_IP: ${{ secrets.SERVER_HOST }}
+        BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+        TEST_CARD: ${{ secrets.TEST_CARD }}
+        TEST_PIN: ${{ secrets.TEST_PIN }}
+        
+        
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
             
-            # Install Qt 6.5.2 using miurahr/setup-qt
-            - name: Setup Qt 6.5.2
-              uses: miurahr/setup-qt@v3
+            # Install Qt
+            - name: Install Qt 6.5.2
+              uses: jurplel/install-qt-action@v4
               with:
                 version: '6.5.2'
-                modules: 'qtbase qttools qtsvg'
+                target: desktop
+                modules: 'qtbase qttools qtsvg qtdeclarative'  
             
             - name: install cmake
               run: sudo apt-get update && sudo apt-get install -y cmake build-essential
@@ -42,11 +51,7 @@ jobs:
 
             - name: login test
               run: ctest --test-dir build --output-on-failure
-              env:
-                BACKEND_IP: ${{ secrets.SERVER_HOST }}
-                BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
-                TEST_CARD: ${{ secrets.TEST_CARD }}
-                TEST_PIN: ${{ secrets.TEST_PIN }}
+
             
             - name: deploy to server via ssh
               if: github.ref == 'refs/heads/main' && github.event_name == 'push'
