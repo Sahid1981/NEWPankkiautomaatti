@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.19)
 project(bank-automat LANGUAGES CXX)
 
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Test Widgets Svg Network)
@@ -22,7 +25,6 @@ qt_add_executable(bank-automat
     apiclient.h
 )
 
-add_executable(logintest logintest.cpp)
 
 target_link_libraries(bank-automat
     PRIVATE
@@ -32,6 +34,21 @@ target_link_libraries(bank-automat
         Qt::Svg
         Qt::Network
 )
+
+
+add_executable(logintest
+    logintest.cpp
+)
+
+
+target_link_libraries(logintest
+    PRIVATE
+        Qt::Test
+        Qt::Core
+        Qt::Widgets
+)
+
+
 include(CTest)
 add_test(NAME LoginTest COMMAND logintest)
 
