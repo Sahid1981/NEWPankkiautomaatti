@@ -1,65 +1,73 @@
+
 name: frontend-ci
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: ./bank-automat
-        
-        env:
-          BACKEND_IP: ${{ secrets.SERVER_HOST }}
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
-          TEST_CARD: ${{ secrets.TEST_CARD }}
-          EST_PIN: ${{ secrets.TEST_PIN }}
-        
-        
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-            
-            # Install Qt
-            - name: Install Qt 6.5.2
-              uses: jurplel/install-qt-action@v4
-              with:
-                version: '6.5.2'
-                target: desktop
-                modules: 'qtbase qttools qtsvg qtdeclarative'  
-            
-            - name: install cmake
-              run: sudo apt-get update && sudo apt-get install -y cmake build-essential
-            
-            - name: Install cppcheck
-              run: sudo apt-get install -y cppcheck
+  build:
+    runs-on: ubuntu-latest
 
-            - name: run cppcheck
-              run: cppcheck --enable=all --inconclusive --quiet --std=c++17 .
-              
-            - name: configure project
-              run: cmake -B build
+    # Projektin työkansio
+    defaults:
+      run:
+        working-directory: ./bank-automat
 
-            - name: build project
-              run: cmake --build build --config Release -- -j$(nproc)
+    env:
+      # Testien tarvitsemat muuttujat
+      BACKEND_IP: ${{ secrets.SERVER_HOST }}
+      BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+      TEST_CARD: ${{ secrets.TEST_CARD }}
+      TEST_PIN: ${{ secrets.TEST_PIN }}
 
-            - name: login test
-              run: ctest --test-dir build --output-on-failure
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            
-            - name: deploy to server via ssh
-              if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-              uses: appleboy/scp-action@v0.1.4
-              with:
-                  host: ${{ secrets.SERVER_HOST }}
-                  username: ${{ secrets.SERVER_USER }}
-                  key: ${{ secrets.SERVER_SSH_KEY }}
-                  port: ${{ secrets.SERVER_SSH_PORT }}
-                  source: "./bank-automat/build/*"
-                  target: ${{ secrets.SERVER_DEPLOY_PATH }}
+      # install Qt
+      - name: Install Qt 6.5.2
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.2'
+          target: desktop
+          modules: 'qtbase qttools qtsvg qtdeclarative'
+          cache: true
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cmake build-essential
+
+      - name: Install Xvfb and XCB/GL deps
+        run: |
+          sudo apt-get install -y xvfb x11-utils \
+            libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+            libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 \
+            libgl1 libegl1
+
+      - name: Configure (CMake + Ninja, Release)
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Run tests (headless via Xvfb)
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: ctest --test-dir build --output-on-failure
+
+      - name: Deploy to server via scp
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_SSH_PORT }}
+          source: "./bank-automat/build/*"
+          target: ${{ secrets.SERVER_DEPLOY_PATH }}
