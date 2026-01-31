@@ -34,12 +34,7 @@ jobs:
                   version: '6.8.3'
                   target: desktop
                   arch: gcc_64
-                  modules: |
-                    qtbase
-                    qtsvg
-                    qttools
-                    gt5compat
-                    qtdeclarative
+                  modules: qtbase,qttest
                   dir: ${{ runner.temp }}/qt
                   cache: true
             
