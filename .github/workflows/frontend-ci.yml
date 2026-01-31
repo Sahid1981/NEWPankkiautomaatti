@@ -54,13 +54,31 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ninja-build cmake build-essential
 
-      # Qt 6 GUI/QML tests headless: xvfb + xcb/GL dependencies
-      - name: Install Xvfb and XCB/GL deps
+      # Xvfb and Qt 6 Linux dependencies
+      - name: Install Xvfb and Qt 6 Linux deps (xcb/xkbcommon/GL)
         run: |
-          sudo apt-get install -y xvfb x11-utils \
-            libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-            libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 \
-            libgl1 libegl1
+          sudo apt-get install -y \
+            xvfb x11-utils \
+            libxcb-cursor0 \
+            libxkbcommon-x11-0 libxkbcommon0 \
+            libxcb1 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+            libxcb-randr0 libxcb-render-util0 libxcb-shape0 \
+            libxcb-shm0 libxcb-sync1 libxcb-xinerama0 libxcb-xfixes0 libxcb-xkb1 \
+            libgl1 libegl1 \
+            libx11-dev libxext-dev libxrender-dev libxi-dev libxfixes-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev \
+            libxcb1-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev \
+            libxcb-randr0-dev libxcb-render-util0-dev libxcb-shape0-dev \
+            libxcb-shm0-dev libxcb-sync-dev libxcb-xinerama0-dev libxcb-xfixes0-dev libxcb-xkb-dev \
+            mesa-common-dev libgl1-mesa-dev
+
+      # CMake-find debug
+      - name: Configure (CMake + Ninja, Release, debug find)
+        run: |
+          cmake -S . -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_FIND_DEBUG_MODE=ON
+
 
       # Configure, build, test
       - name: Configure (CMake + Ninja, Release)
