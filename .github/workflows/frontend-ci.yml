@@ -29,10 +29,6 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade aqtinstall
-      # list available Qt versions
-      - name: List available Qt versions
-        run: |
-          python3 -m aqt list-qt linux desktop
   
       - name: Install Qt 6.5.2 (desktop gcc_64) with modules
         run: |

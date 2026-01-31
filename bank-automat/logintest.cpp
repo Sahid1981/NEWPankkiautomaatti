@@ -44,4 +44,4 @@ private slots:
 };
 
 QTEST_MAIN(LoginTest)
-//#include "logintest.moc" - added to CMakeLists.txt
+#include "logintest.moc" - added to CMakeLists.txt
