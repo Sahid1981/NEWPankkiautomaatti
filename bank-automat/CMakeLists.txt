@@ -43,9 +43,11 @@ add_executable(logintest
 
 target_link_libraries(logintest
     PRIVATE
-        Qt::Test
         Qt::Core
         Qt::Widgets
+        Qt::Test
+        Qt::Svg
+        Qt::Network   
 )
 
 
