@@ -27,16 +27,12 @@ jobs:
                 restore-keys: |
                   ${{ runner.os }}-qt-
             
-            # Install Qt
-            - name: install qt 6.5.2
-              uses: jurplel/install-qt-action@v4
+            # Install Qt 6.5.2 using miurahr/setup-qt
+            - name: Setup Qt 6.5.2
+              uses: miurahr/setup-qt@v3
               with:
-                  version: '6.5.2'
-                  target: desktop
-                  arch: gcc_64
-                  modules: qtbase qttools qtsvg
-                  dir: ${{ runner.temp }}/qt
-                  cache: true
+                version: '6.5.2'
+                modules: 'qtbase qttools qtsvg'
             
             - name: install cmake
               run: sudo apt-get update && sudo apt-get install -y cmake build-essential qt6-base-dev
