@@ -79,6 +79,7 @@ async function login(req, res, next) {
 
         res.status(200).json({
             token,
+            role: userRole,
             fName,
             card: {
                 idCard: card.idcard,

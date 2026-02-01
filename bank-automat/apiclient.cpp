@@ -103,6 +103,7 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
 
             out.token = o.value("token").toString();
             out.fName = o.value("fName").toString();
+            out.role  = o.value("role").toString();
             if (out.token.isEmpty()) {
                 // Treat missing token as a server-side contract error
                 ApiError e;
