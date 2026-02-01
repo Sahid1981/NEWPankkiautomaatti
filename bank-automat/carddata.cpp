@@ -48,7 +48,7 @@ void carddata::updateModel()
         QStandardItem *idUserItem = new QStandardItem(card.iduser);
         idUserItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         tableModel->setItem(row, 2 , idUserItem);
-        QString islockedString = card.is_locked ? "Lukittu" : "Aktiivinen";
+        QString islockedString = card.is_locked ? "True" : "False";
         QStandardItem *lockedItem = new QStandardItem(islockedString);
         lockedItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         tableModel->setItem(row, 3, lockedItem);

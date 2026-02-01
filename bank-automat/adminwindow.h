@@ -22,10 +22,12 @@ private:
     class userdata *userData;
     class accountsdata *accountsData;
     class carddata *cardData;
+    class logs *logData;
 
     QByteArray testUserData;
     QByteArray testAccountsData;
     QByteArray testCardData;
+    QByteArray testLogData;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
