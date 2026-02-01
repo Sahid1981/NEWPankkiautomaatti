@@ -38,7 +38,8 @@ struct LoginResultDto {
     QString token;                          // JWT token
     QString idCard;                         // Card identifier
     QString idUser;                         // User identifier
-    QString fName;
+    QString fName;                          // User first name
+    QString role;                           // User role
     bool isLocked = false;                  // Whether the card is locked
     QVector<AccountDto> accounts;           // Accounts linked to the card
     bool requiresAccountSelection = false;  // True if user must choose an account
