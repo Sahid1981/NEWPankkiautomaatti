@@ -39,16 +39,16 @@ void carddata::updateModel()
 
     for (int row = 0; row < cardDataList.size(); row++) {
         const card &card = cardDataList[row];
-        QStandardItem *idCardItem = new QStandardItem(card.idcard);
+        QStandardItem *idCardItem = new QStandardItem(card.idCard);
         idCardItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         tableModel->setItem(row, 0, idCardItem );
         QStandardItem *PINItem = new QStandardItem(card.cardPIN);
         PINItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         tableModel->setItem(row, 1, PINItem);
-        QStandardItem *idUserItem = new QStandardItem(card.iduser);
+        QStandardItem *idUserItem = new QStandardItem(card.idUser);
         idUserItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         tableModel->setItem(row, 2 , idUserItem);
-        QString islockedString = card.is_locked ? "True" : "False";
+        QString islockedString = card.isLocked ? "True" : "False";
         QStandardItem *lockedItem = new QStandardItem(islockedString);
         lockedItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         tableModel->setItem(row, 3, lockedItem);

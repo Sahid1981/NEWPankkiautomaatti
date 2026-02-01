@@ -89,6 +89,7 @@ public:
 
     void getUser(QString idUser);
     void addUser(QString idUser, QString fname, QString lname, QString streetaddress, QString role);
+    void updateUser(QString idUser, QString fname, QString lname, QString streetaddress, QString role);
 
 signals:
     // Emitted when login succeeds and all required data is parsed
@@ -103,9 +104,10 @@ signals:
     // Emitted when account transaction logs are received
     void logsReceived(int idAccount, const QVector<LogItemDto>& logs);
 
-    //emitted when user is received
-    //void userReceived(QString idUser, QString fname, QString lname, QString streetaddress, QString role);
+    // Emitted when user is received
     void userReceived(const QByteArray& userInfo);
+    // Emitted when user is created
+    void userCreated(QString idUser);
 
     // Emitted whenever any API request fails
     void requestFailed(const ApiError& error);

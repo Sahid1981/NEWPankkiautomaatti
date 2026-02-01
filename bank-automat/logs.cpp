@@ -52,11 +52,11 @@ void logs::updateModel()
 
     for (int i = start; i < end; i++) {
         const logevents &event = loglist[i];
-        QStandardItem *idlog = new QStandardItem(QString::number(event.idlog));
+        QStandardItem *idlog = new QStandardItem(QString::number(event.idLog));
         idlog->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         QStandardItem *aika = new QStandardItem(event.time);
         aika->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balancechange));
+        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange));
         muutos->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tableModel->appendRow({idlog, aika, muutos});
     }
@@ -77,11 +77,11 @@ void logs::updateModelAdmin()
 
     for (int row = 0; row < loglist.size(); row++) {
         const logevents &event = loglist[row];
-        QStandardItem *idlog = new QStandardItem(QString::number(event.idlog));
+        QStandardItem *idlog = new QStandardItem(QString::number(event.idLog));
         idlog->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         QStandardItem *aika = new QStandardItem(event.time);
         aika->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balancechange));
+        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange));
         muutos->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tableModelAdmin->appendRow({idlog, aika, muutos});
     }

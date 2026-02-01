@@ -8,10 +8,10 @@ class accounts
 {
 public:
     accounts();
-    int idaccount;
-    QString iduser;
+    int idAccount;
+    QString idUser;
     double balance;
-    double creditlimit;
+    double creditLimit;
     static accounts mapJson(const QJsonObject &json);
 };
 

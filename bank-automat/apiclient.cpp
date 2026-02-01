@@ -70,7 +70,7 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
     }
 
     // Handle response asynchronously
-    connect(reply, &QNetworkReply::finished, this, [this, reply, path]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, path, body]() {
         ApiError err;
         QJsonDocument doc = readJson(reply, err);
 
@@ -157,6 +157,12 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
             const double newBalance = o.value("balance").toDouble();
 
             emit withdrawSucceeded(idAccount, newBalance);
+        }
+
+        //Special case for creatign a user
+        if (path.startsWith("/users")) {
+            QString id = body.value("idUser").toString();
+            emit userCreated(id);
         }
 
         reply->deleteLater();
@@ -318,7 +324,7 @@ void ApiClient::getUser(QString idUser)
 
 void ApiClient::addUser(QString idUser, QString fname, QString lname, QString streetaddress, QString role)
 {
-    sendJson("POST", QString("/users"), QJsonObject{{"idUser", idUser},{"fname", fname},{"lname",lname},{"streetAddress", streetaddress}, {"role", role}});
+    sendJson("POST", QString("/users"), QJsonObject{{"idUser", idUser},{"firstName", fname},{"lastName",lname},{"streetAddress", streetaddress}, {"role", role}});
 }
 
 // POST /atm/{idAccount}/withdraw with { amount }

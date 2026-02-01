@@ -31,47 +31,47 @@ adminwindow::adminwindow(int idAccount, const QString &idUser, const QString &fN
     ])";
 
     testAccountsData = R"([
-    {"idaccount": 1, "iduser": "1", "balance": 500, "credilimit": 0},
-    {"idaccount": 2, "iduser": "2", "balance": 1000000, "creditlimit": 0},
-    {"idaccount": 3, "iduser": "2", "balance": 10000, "creditlimit": 50000},
-    {"idaccount": 4, "iduser": "3", "balance": 25000, "creditlimit": 0},
-    {"idaccount": 5, "iduser": "3", "balance": 250, "creditlimit": 1500},
-    {"idaccount": 6, "iduser": "4", "balance": 1000, "creditlimit": 0}
+    {"idAccount": 1, "idUser": "1", "balance": 500, "crediLimit": 0},
+    {"idAccount": 2, "idUser": "2", "balance": 1000000, "creditLimit": 0},
+    {"idAccount": 3, "idUser": "2", "balance": 10000, "creditLimit": 50000},
+    {"idAccount": 4, "idUser": "3", "balance": 25000, "creditLimit": 0},
+    {"idAccount": 5, "idUser": "3", "balance": 250, "creditLimit": 1500},
+    {"idAccount": 6, "idUser": "4", "balance": 1000, "creditLimit": 0}
     ])";
 
     testCardData = R"([
-    {"idcard": "1", "cardPIN": "$2b$10$nS6H0mXIsmR8S.r6Yp89neMv5.7.8JmQ6mGzO8Z6V6H8N6f6Y6e6q", "iduser": "1", "is_locked": false},
-    {"idcard": "2", "cardPIN": "$2b$10$Eixza975pS8En6Z6v6f6uef6u6e6u6e6u6e6u6e6u6e6u6e6u6e6u", "iduser": "2", "is_locked": false},
-    {"idcard": "3", "cardPIN": "$2b$10$K7L9M0N1O2P3Q4R5S6T7U8V9W0X1Y2Z3A4B5C6D7E8F9G0H1I2J3K", "iduser": "3", "is_locked": false},
-    {"idcard": "4", "cardPIN": "$2b$10$K7L9M0N1O2P3Q4R5S6f6uef6u6e6u6e6A4BzO8Z6V6H8G0H1I.7.8", "iduser": "4", "is_locked": true}
+    {"idCard": "1", "cardPIN": "$2b$10$nS6H0mXIsmR8S.r6Yp89neMv5.7.8JmQ6mGzO8Z6V6H8N6f6Y6e6q", "idUser": "1", "isLocked": false},
+    {"idCard": "2", "cardPIN": "$2b$10$Eixza975pS8En6Z6v6f6uef6u6e6u6e6u6e6u6e6u6e6u6e6u6e6u", "idUser": "2", "isLocked": false},
+    {"idCard": "3", "cardPIN": "$2b$10$K7L9M0N1O2P3Q4R5S6T7U8V9W0X1Y2Z3A4B5C6D7E8F9G0H1I2J3K", "idUser": "3", "isLocked": false},
+    {"idCard": "4", "cardPIN": "$2b$10$K7L9M0N1O2P3Q4R5S6f6uef6u6e6u6e6A4BzO8Z6V6H8G0H1I.7.8", "idUser": "4", "isLocked": true}
     ])";
 
     testLogData = R"([
-    {"idlog": 1, "time": "2026-01-18 12:00", "balancechange": -20.50},
-    {"idlog": 2, "time": "2026-01-18 12:05", "balancechange": 100.00},
-    {"idlog": 3, "time": "2026-01-18 13:30", "balancechange": -5.00},
-    {"idlog": 4, "time": "2026-01-18 14:15", "balancechange": -12.80},
-    {"idlog": 5, "time": "2026-01-18 15:00", "balancechange": 2450.00},
-    {"idlog": 6, "time": "2026-01-18 16:45", "balancechange": -65.20},
-    {"idlog": 7, "time": "2026-01-19 08:30", "balancechange": -4.50},
-    {"idlog": 8, "time": "2026-01-19 09:12", "balancechange": -110.00},
-    {"idlog": 9, "time": "2026-01-19 11:50", "balancechange": 15.00},
-    {"idlog": 10, "time": "2026-01-19 13:20", "balancechange": -22.15},
-    {"idlog": 11, "time": "2026-01-19 17:05", "balancechange": -45.00},
-    {"idlog": 12, "time": "2026-01-20 10:00", "balancechange": -3.20},
-    {"idlog": 13, "time": "2026-01-20 12:30", "balancechange": 50.00},
-    {"idlog": 14, "time": "2026-01-20 15:45", "balancechange": -200.00},
-    {"idlog": 15, "time": "2026-01-20 18:20", "balancechange": -8.90},
-    {"idlog": 16, "time": "2026-01-21 09:15", "balancechange": -35.00},
-    {"idlog": 17, "time": "2026-01-21 11:40", "balancechange": 120.50},
-    {"idlog": 18, "time": "2026-01-21 14:05", "balancechange": -12.30},
-    {"idlog": 19, "time": "2026-01-21 19:50", "balancechange": -85.00},
-    {"idlog": 20, "time": "2026-01-22 08:00", "balancechange": 3100.00},
-    {"idlog": 21, "time": "2026-01-22 10:25", "balancechange": -4.20},
-    {"idlog": 22, "time": "2026-01-22 13:10", "balancechange": -55.60},
-    {"idlog": 23, "time": "2026-01-22 16:45", "balancechange": 25.00},
-    {"idlog": 24, "time": "2026-01-23 12:15", "balancechange": -150.00},
-    {"idlog": 25, "time": "2026-01-23 15:30", "balancechange": -9.99}
+    {"idLog": 1, "time": "2026-01-18 12:00", "balanceChange": -20.50},
+    {"idLog": 2, "time": "2026-01-18 12:05", "balanceChange": 100.00},
+    {"idLog": 3, "time": "2026-01-18 13:30", "balanceChange": -5.00},
+    {"idLog": 4, "time": "2026-01-18 14:15", "balanceChange": -12.80},
+    {"idLog": 5, "time": "2026-01-18 15:00", "balanceChange": 2450.00},
+    {"idLog": 6, "time": "2026-01-18 16:45", "balanceChange": -65.20},
+    {"idLog": 7, "time": "2026-01-19 08:30", "balanceChange": -4.50},
+    {"idLog": 8, "time": "2026-01-19 09:12", "balanceChange": -110.00},
+    {"idLog": 9, "time": "2026-01-19 11:50", "balanceChange": 15.00},
+    {"idLog": 10, "time": "2026-01-19 13:20", "balanceChange": -22.15},
+    {"idLog": 11, "time": "2026-01-19 17:05", "balanceChange": -45.00},
+    {"idLog": 12, "time": "2026-01-20 10:00", "balanceChange": -3.20},
+    {"idLog": 13, "time": "2026-01-20 12:30", "balanceChange": 50.00},
+    {"idLog": 14, "time": "2026-01-20 15:45", "balanceChange": -200.00},
+    {"idLog": 15, "time": "2026-01-20 18:20", "balanceChange": -8.90},
+    {"idLog": 16, "time": "2026-01-21 09:15", "balanceChange": -35.00},
+    {"idLog": 17, "time": "2026-01-21 11:40", "balanceChange": 120.50},
+    {"idLog": 18, "time": "2026-01-21 14:05", "balanceChange": -12.30},
+    {"idLog": 19, "time": "2026-01-21 19:50", "balanceChange": -85.00},
+    {"idLog": 20, "time": "2026-01-22 08:00", "balanceChange": 3100.00},
+    {"idLog": 21, "time": "2026-01-22 10:25", "balanceChange": -4.20},
+    {"idLog": 22, "time": "2026-01-22 13:10", "balanceChange": -55.60},
+    {"idLog": 23, "time": "2026-01-22 16:45", "balanceChange": 25.00},
+    {"idLog": 24, "time": "2026-01-23 12:15", "balanceChange": -150.00},
+    {"idLog": 25, "time": "2026-01-23 15:30", "balanceChange": -9.99}
     ])";
 
     userData = new userdata(this);
@@ -127,6 +127,13 @@ adminwindow::adminwindow(int idAccount, const QString &idUser, const QString &fN
                 //qDebug() << "RAW DATA FROM API:" << userInfo;
         }
     );
+
+    connect(m_api, &ApiClient::userCreated, this, [this](QString id) {
+        //Just in case something goes wrong it doesnt crash with empty id
+        if (!id.isEmpty()) {
+            m_api->getUser(id);
+        }
+    });
 }
 
 adminwindow::~adminwindow()
@@ -175,13 +182,19 @@ void adminwindow::on_btnLogOutLowBar_2_clicked()
 
 void adminwindow::on_btnKayttajaLuoUusi_clicked()
 {
-    QString iduser = ui->lineAsiakkaatID->text();
-    QString fname = ui->lineAsiakkaatFname->text();
-    QString lname = ui->lineAsiakkaatLname->text();
-    QString address = ui->lineAsiakkaatAddress->text();
-    QString role = ui->lineAsiakkaatRole->text();
-    if (!iduser.isEmpty()) {
-        m_api->addUser(iduser, fname, lname, address, role);
+    QString idUser = ui->lineAsiakkaatID->text().trimmed();
+    QString fname = ui->lineAsiakkaatFname->text().trimmed();
+    QString lname = ui->lineAsiakkaatLname->text().trimmed();
+    QString address = ui->lineAsiakkaatAddress->text().trimmed();
+    QString role = ui->lineAsiakkaatRole->text().trimmed();
+    if (!idUser.isEmpty()) {
+        m_api->addUser(idUser, fname, lname, address, role);
+
+        ui->lineAsiakkaatID->clear();
+        ui->lineAsiakkaatFname->clear();
+        ui->lineAsiakkaatLname->clear();
+        ui->lineAsiakkaatAddress->clear();
+        ui->lineAsiakkaatRole->clear();
     }
 }
 
@@ -194,10 +207,11 @@ void adminwindow::on_btnLokitHae_clicked()
 
 void adminwindow::on_btnKayttajaHae_clicked()
 {
-    QString iduser = ui->lineAsiakkaatID->text();
-    if (!iduser.isEmpty()) {
-        m_api->getUser(iduser);
+    QString idUser = ui->lineAsiakkaatID->text();
+    if (!idUser.isEmpty()) {
+        m_api->getUser(idUser);
 
+        ui->lineAsiakkaatID->clear();
     }
 }
 

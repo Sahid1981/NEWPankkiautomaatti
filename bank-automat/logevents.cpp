@@ -5,9 +5,9 @@ logevents::logevents() {}
 logevents logevents::mapJson(const QJsonObject &json)
 {
     logevents logevent;
-    logevent.idlog = json["idlog"].toInt();
-    logevent.idaccount = json["idaccount"].toInt();
+    logevent.idLog = json["idLog"].toInt();
+    logevent.idAccount = json["idAccount"].toInt();
     logevent.time = json["time"].toString();
-    logevent.balancechange = json["balancechange"].toDouble();
+    logevent.balanceChange = json["balanceChange"].toDouble();
     return logevent;
 }

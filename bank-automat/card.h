@@ -8,10 +8,10 @@ class card
 {
 public:
     card();
-    QString idcard;
+    QString idCard;
     QString cardPIN;
-    QString iduser;
-    int is_locked;
+    QString idUser;
+    int isLocked;
     static card mapJson(const QJsonObject &json);
 };
 

@@ -5,9 +5,9 @@ card::card() {}
 card card::mapJson(const QJsonObject &json)
 {
     card card;
-    card.idcard = json["idcard"].toString();
+    card.idCard = json["idCard"].toString();
     card.cardPIN = json["cardPIN"].toString();
-    card.iduser = json["iduser"].toString();
-    card.is_locked = json["is_locked"].toBool();
+    card.idUser = json["idUser"].toString();
+    card.isLocked = json["isLocked"].toBool();
     return card;
 }
