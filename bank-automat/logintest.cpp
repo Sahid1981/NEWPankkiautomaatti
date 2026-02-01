@@ -17,7 +17,8 @@ private slots:
         QString url = "http://" + backend_ip + ":" + backend_port + "/auth/login";
         QVERIFY(QUrl(url).isValid());
 
-        QNetworkRequest request(QUrl(url));
+        QUrl requestUrl(url);
+        QNetworkRequest request(requestUrl);
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
         
         // get test card and pin from environment variables
