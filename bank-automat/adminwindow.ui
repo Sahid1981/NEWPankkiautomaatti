@@ -2153,7 +2153,7 @@
            <string>Päivitä luottoraja</string>
           </property>
          </widget>
-         <widget class="QPushButton" name="btnTiliPaivitaLuottoraja_2">
+         <widget class="QPushButton" name="btnTiliPoistaTili">
           <property name="geometry">
            <rect>
             <x>540</x>

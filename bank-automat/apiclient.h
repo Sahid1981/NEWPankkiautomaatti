@@ -95,6 +95,8 @@ public:
 
     void getAccount(int idAccount);
     void addAccount(QString idUser, double balance, double creditLimit);
+    void updateCreditLimit(int idAccount, double creditLimit);
+    void deleteAccount(int idAccount);
 
 signals:
     // Emitted when login succeeds and all required data is parsed
@@ -122,6 +124,10 @@ signals:
     void accountReceived(const QByteArray& accountInfo);
     // Emitted when account is created
     void accountCreated(const QByteArray& accountInfo);
+    // Emitted when creditlimit is updated
+    void accountCreditUpdated(int idAccount);
+    // Emittend when account is deleted
+    void accountDeleted();
 
     // Emitted whenever any API request fails
     void requestFailed(const ApiError& error);

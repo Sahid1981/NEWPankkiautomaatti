@@ -171,9 +171,9 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
             emit userCreated(id);
         }
 
-        // Special case for deletin a user
+        // Special case for deleting a user
         if (path.startsWith("/users") && method == "DELETE") {
-            QString id = body.value("idUser").toString();
+            //QString id = body.value("idUser").toString();
             emit userDeleted();
         }
 
@@ -181,6 +181,17 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
         if (path.startsWith("/account") && method == "POST") {
             QByteArray responseData = doc.toJson(QJsonDocument::Compact);
             emit accountCreated(responseData);
+        }
+
+        // Special case for updating creditlimit
+        if (path.startsWith("/account") && method == "PUT") {
+            int idFromPath = path.section('/',2,2).toInt();
+            emit accountCreditUpdated(idFromPath);
+        }
+
+        // Special case for deleting an account
+        if (path.startsWith("/account") && method == "DELETE") {
+            emit accountDeleted();
         }
 
         reply->deleteLater();
@@ -354,12 +365,12 @@ void ApiClient::addUser(QString idUser, QString firstName, QString lastName, QSt
 //Role cannot currently be changed due to mysql procedure limitation
 void ApiClient::updateUser(QString idUser, QString firstName, QString lastName, QString streetaddress) //, QString role)
 {
-    sendJson("PUT",QString("/users/%1").arg(idUser), QJsonObject{{"idUser", idUser},{"firstName", firstName},{"lastName",lastName},{"streetAddress", streetaddress}});
+    sendJson("PUT", QString("/users/%1").arg(idUser), QJsonObject{{"idUser", idUser},{"firstName", firstName},{"lastName",lastName},{"streetAddress", streetaddress}});
 }
 
 void ApiClient::deleteUser(QString idUser)
 {
-    sendJson("DELETE", QString("/users/%1").arg(idUser),QJsonObject{{}});
+    sendJson("DELETE", QString("/users/%1").arg(idUser), QJsonObject{{}});
 }
 
 void ApiClient::getAccount(int idAccount)
@@ -370,6 +381,16 @@ void ApiClient::getAccount(int idAccount)
 void ApiClient::addAccount(QString idUser, double balance, double creditLimit)
 {
     sendJson("POST", QString("/accounts"), QJsonObject{{"idUser", idUser},{"balance", balance},{"creditLimit", creditLimit}});
+}
+
+void ApiClient::updateCreditLimit(int idAccount, double creditLimit)
+{
+    sendJson("PUT", QString("/accounts/%1").arg(idAccount), QJsonObject{{"creditLimit", creditLimit}});
+}
+
+void ApiClient::deleteAccount(int idAccount)
+{
+    sendJson("DELETE", QString("/accounts/%1").arg(idAccount), QJsonObject{{}});
 }
 
 // POST /atm/{idAccount}/withdraw with { amount }

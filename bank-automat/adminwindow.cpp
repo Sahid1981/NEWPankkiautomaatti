@@ -128,7 +128,12 @@ adminwindow::adminwindow(int idAccount, const QString &idUser, const QString &fN
     connect(m_api, &ApiClient::userReceived, this, [this](QByteArray userInfo) {
         userData->setUserData(userInfo);
         userData->updateModel();
-
+        //clears inputs
+        ui->lineAsiakkaatID->clear();
+        ui->lineAsiakkaatFname->clear();
+        ui->lineAsiakkaatLname->clear();
+        ui->lineAsiakkaatAddress->clear();
+        ui->lineAsiakkaatRole->clear();
     });
 
     connect(m_api, &ApiClient::userCreated, this, [this](QString id) {
@@ -142,19 +147,58 @@ adminwindow::adminwindow(int idAccount, const QString &idUser, const QString &fN
         //Just in case something goes wrong it doesnt crash with empty id
         if (!id.isEmpty()) {
             m_api->getUser(id);
+            //clears inputs
+            ui->lineAsiakkaatID->clear();
+            ui->lineAsiakkaatFname->clear();
+            ui->lineAsiakkaatLname->clear();
+            ui->lineAsiakkaatAddress->clear();
+            ui->lineAsiakkaatRole->clear();
         }
+    });
+
+    connect(m_api, &ApiClient::userDeleted, this, [this]() {
+        ui->lineAsiakkaatID->clear();
+        //Clears the table after deleting
+        userData->setUserData(QByteArray());
     });
 
     connect(m_api, &ApiClient::accountReceived, this, [this](QByteArray accountInfo) {
         accountsData->setAccountsData(accountInfo);
         accountsData->updateModel();
-        //qDebug() << "RAW DATA FROM API:" << accountInfo;
+        //clears inputs
+        ui->lineTilitIdaccount->clear();
+        ui->lineTilitIduser->clear();
+        ui->lineTilitBalance->clear();
+        ui->lineTilitCreditlimit->clear();
     });
 
     connect(m_api, &ApiClient::accountCreated, this, [this](QByteArray accountInfo) {
         accountsData->setAccountsData(accountInfo);
         accountsData->updateModel();
-        //m_api->getAccount(idAccount);
+        //clears inputs
+        ui->lineTilitIdaccount->clear();
+        ui->lineTilitIduser->clear();
+        ui->lineTilitBalance->clear();
+        ui->lineTilitCreditlimit->clear();
+    });
+
+    connect(m_api, &ApiClient::accountCreditUpdated, this, [this](int idAccount) {
+        m_api->getAccount(idAccount);
+        //clears inputs
+        ui->lineTilitIdaccount->clear();
+        ui->lineTilitIduser->clear();
+        ui->lineTilitBalance->clear();
+        ui->lineTilitCreditlimit->clear();
+    });
+
+    connect(m_api, &ApiClient::accountDeleted, this, [this] {
+        //Clears the table after deleting
+        accountsData->setAccountsData(QByteArray());
+        //clears inputs
+        ui->lineTilitIdaccount->clear();
+        ui->lineTilitIduser->clear();
+        ui->lineTilitBalance->clear();
+        ui->lineTilitCreditlimit->clear();
     });
 }
 
@@ -232,8 +276,6 @@ void adminwindow::on_btnKayttajaHae_clicked()
     QString idUser = ui->lineAsiakkaatID->text();
     if (!idUser.isEmpty()) {
         m_api->getUser(idUser);
-
-        ui->lineAsiakkaatID->clear();
     }
 }
 
@@ -259,12 +301,6 @@ void adminwindow::on_btnKayttajaPaivitaTietoja_clicked()
         QString streetAddress = inputAddress.isEmpty() ? currentAddress : inputAddress;
         //QString role = inputRole.isEmpty() ? currentRole : inputRole;
         m_api->updateUser(idUser, fname, lname, streetAddress);
-
-        ui->lineAsiakkaatID->clear();
-        ui->lineAsiakkaatFname->clear();
-        ui->lineAsiakkaatLname->clear();
-        ui->lineAsiakkaatAddress->clear();
-        ui->lineAsiakkaatRole->clear();
     }
 }
 
@@ -274,10 +310,6 @@ void adminwindow::on_btnKayttajaPoista_clicked()
     QString idUser = ui->lineAsiakkaatID->text();
     if (!idUser.isEmpty()) {
         m_api->deleteUser(idUser);
-
-        ui->lineAsiakkaatID->clear();
-        //Clears the table after deleting
-        userData->setUserData(QByteArray());
     }
 }
 
@@ -291,10 +323,6 @@ void adminwindow::on_btnTiliHae_clicked()
         int intIdAccount = idAccount.toInt(&ok);
         if (ok) {
             m_api->getAccount(intIdAccount);
-            ui->lineTilitIdaccount->clear();
-            ui->lineTilitIduser->clear();
-            ui->lineTilitBalance->clear();
-            ui->lineTilitCreditlimit->clear();
         }
     }
 }
@@ -307,10 +335,36 @@ void adminwindow::on_btnTiliLuoUusi_clicked()
     double creditLimit = ui->lineTilitCreditlimit->text().trimmed().toDouble();
     if (!idUser.isEmpty()) {
         m_api->addAccount(idUser, balance, creditLimit);
-        ui->lineTilitIdaccount->clear();
-        ui->lineTilitIdaccount->clear();
-        ui->lineTilitBalance->clear();
-        ui->lineTilitCreditlimit->clear();
+    }
+}
+
+
+void adminwindow::on_btnTiliPaivitaLuottoraja_clicked()
+{
+    QString idAccount = ui->lineTilitIdaccount->text().trimmed();
+    QString creditLimit = ui->lineTilitCreditlimit->text().trimmed();
+    if (!idAccount.isEmpty() && !creditLimit.isEmpty()) {
+        bool okId;
+        bool okCredit;
+        int intIdAccount = idAccount.toInt(&okId);
+        double doubleCreditLimit = creditLimit.toDouble(&okCredit);
+        if (okId && okCredit) {
+            m_api->updateCreditLimit(intIdAccount, doubleCreditLimit);
+        }
+    }
+}
+
+
+
+void adminwindow::on_btnTiliPoistaTili_clicked()
+{
+    QString idAccount = ui->lineTilitIdaccount->text().trimmed();
+    if (!idAccount.isEmpty()) {
+        bool ok;
+        int intIdAccount = idAccount.toInt(&ok);
+        if (ok) {
+            m_api->deleteAccount(intIdAccount);
+        }
     }
 }
 
