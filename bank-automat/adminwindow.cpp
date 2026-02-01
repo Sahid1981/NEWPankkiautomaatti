@@ -100,8 +100,11 @@ adminwindow::adminwindow(int idAccount, const QString &idUser, const QString &fN
     ui->tableUserData->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Fixed);
     ui->tableUserData->setColumnWidth(4, 60);
 
-    //IdAccount only accept numbers
+    //IdAccount only accept integers
     ui->lineTilitIdaccount->setValidator(new QIntValidator(0, 999999, this));
+    //Balance and creditLimit only accept doubles of correct kind
+    ui->lineTilitBalance->setValidator(new QDoubleValidator(0, 9999999999, 2, this));
+    ui->lineTilitCreditlimit->setValidator(new QDoubleValidator(0, 9999999999, 2, this));
     ui->tableAccountsData->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
     ui->tableAccountsData->setColumnWidth(0, 80);
     ui->tableAccountsData->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
@@ -145,7 +148,13 @@ adminwindow::adminwindow(int idAccount, const QString &idUser, const QString &fN
     connect(m_api, &ApiClient::accountReceived, this, [this](QByteArray accountInfo) {
         accountsData->setAccountsData(accountInfo);
         accountsData->updateModel();
-        qDebug() << "RAW DATA FROM API:" << accountInfo;
+        //qDebug() << "RAW DATA FROM API:" << accountInfo;
+    });
+
+    connect(m_api, &ApiClient::accountCreated, this, [this](QByteArray accountInfo) {
+        accountsData->setAccountsData(accountInfo);
+        accountsData->updateModel();
+        //m_api->getAccount(idAccount);
     });
 }
 
@@ -283,7 +292,25 @@ void adminwindow::on_btnTiliHae_clicked()
         if (ok) {
             m_api->getAccount(intIdAccount);
             ui->lineTilitIdaccount->clear();
+            ui->lineTilitIduser->clear();
+            ui->lineTilitBalance->clear();
+            ui->lineTilitCreditlimit->clear();
         }
+    }
+}
+
+
+void adminwindow::on_btnTiliLuoUusi_clicked()
+{
+    QString idUser = ui->lineTilitIduser->text().trimmed();
+    double balance = ui->lineTilitBalance->text().trimmed().toDouble();
+    double creditLimit = ui->lineTilitCreditlimit->text().trimmed().toDouble();
+    if (!idUser.isEmpty()) {
+        m_api->addAccount(idUser, balance, creditLimit);
+        ui->lineTilitIdaccount->clear();
+        ui->lineTilitIdaccount->clear();
+        ui->lineTilitBalance->clear();
+        ui->lineTilitCreditlimit->clear();
     }
 }
 

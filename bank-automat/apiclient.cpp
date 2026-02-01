@@ -165,16 +165,22 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
             emit userUpdated(idFromPath);
         }
 
-        //Special case for creating a user
+        // Special case for creating a user
         if (path.startsWith("/users") && method == "POST") {
             QString id = body.value("idUser").toString();
             emit userCreated(id);
         }
 
-        //Special case for deletin a user
+        // Special case for deletin a user
         if (path.startsWith("/users") && method == "DELETE") {
             QString id = body.value("idUser").toString();
             emit userDeleted();
+        }
+
+        // Special case for creating account
+        if (path.startsWith("/account") && method == "POST") {
+            QByteArray responseData = doc.toJson(QJsonDocument::Compact);
+            emit accountCreated(responseData);
         }
 
         reply->deleteLater();
@@ -359,6 +365,11 @@ void ApiClient::deleteUser(QString idUser)
 void ApiClient::getAccount(int idAccount)
 {
     sendNoBody("GET", QString("/accounts/%1").arg(idAccount));
+}
+
+void ApiClient::addAccount(QString idUser, double balance, double creditLimit)
+{
+    sendJson("POST", QString("/accounts"), QJsonObject{{"idUser", idUser},{"balance", balance},{"creditLimit", creditLimit}});
 }
 
 // POST /atm/{idAccount}/withdraw with { amount }
