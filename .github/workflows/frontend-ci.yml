@@ -37,11 +37,10 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade aqtinstall
   
-      - name: Install Qt 6.5.2 (desktop gcc_64) with modules
+      - name: Install Qt 6.5.2 (desktop gcc_64)
         run: |
           python3 -m aqt install-qt linux desktop 6.5.2 gcc_64 \
-            --outputdir "$GITHUB_WORKSPACE/Qt" \
-            --modules qtsvg
+            --outputdir "$GITHUB_WORKSPACE/Qt"
       # Export Qt env variables for CMake
       - name: Export Qt env for CMake
         run: |
