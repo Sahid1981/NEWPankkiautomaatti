@@ -7,6 +7,7 @@
 
 #include "accountselect.h"
 #include "account.h"
+#include "adminwindow.h"
 #include "ui_accountselect.h"
 #include <QPainter>
 #include <QPixmap>
@@ -36,10 +37,15 @@ accountselect::accountselect(
     // Check which account types the user has
     const bool hasDebit  = accountIdByType.contains("debit");
     const bool hasCredit = accountIdByType.contains("credit");
+    QString hasAdmin = loginResult.role;
     
     // Show only the buttons that correspond to existing accounts
     ui->btnSelectDebit->setVisible(hasDebit);
     ui->btnSelectCredit->setVisible(hasCredit);
+    if (hasAdmin == "admin"){
+        ui->btnSelectAdmin->setVisible(true);
+    }
+
 }
 
 // Destructor: clean up UI
@@ -60,6 +66,12 @@ void accountselect::on_btnSelectCredit_clicked()
 {
     selectedAccountType = "credit";
     openAccountWindow();
+}
+
+// Called automatically when the Admin button is clicked
+void accountselect::on_btnSelectAdmin_clicked()
+{
+    openAdminWindow();
 }
 
 // Opens the main account window based on the selected account type
@@ -86,6 +98,26 @@ void accountselect::openAccountWindow()
     close();
 }
 
+void accountselect::openAdminWindow()
+{
+    //Some of this data probablys is not needed, but transferred just in case to match account window
+    const int idAccount = accountIdByType.value(selectedAccountType, -1);
+    // Create the admin window
+    adminwindow* admin = new adminwindow(
+        idAccount,
+        m_login.idUser,
+        m_login.fName,
+        m_api,
+        nullptr
+        );
+    // Automatically delete the window object when it is closed
+    admin->setAttribute(Qt::WA_DeleteOnClose);
+    // Show the admin window in full screen
+    admin->showMaximized();
+    // Close this account selection dialog
+    close();
+}
+
 // Custom paint event to draw a background image for the dialog
 void accountselect::paintEvent(QPaintEvent *)
 {
@@ -95,3 +127,6 @@ void accountselect::paintEvent(QPaintEvent *)
     // Scale and draw the image to fill the entire dialog
     painter.drawPixmap(rect(), bg);
 }
+
+
+

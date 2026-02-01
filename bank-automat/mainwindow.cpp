@@ -54,7 +54,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Create the API client used for backend communication
     api = new ApiClient(this);
-    api->setBaseUrl(QUrl("http://127.0.0.1:3000"));
+    //Test IP
+    //api->setBaseUrl(QUrl("http://127.0.0.1:3000"));
+    //Real IP
+    api->setBaseUrl(QUrl("http://86.50.23.239:3000"));
 
     // Handle successful login
     connect(api, &ApiClient::loginSucceeded, this,
@@ -144,34 +147,6 @@ void MainWindow::setMainControlsVisible(bool visible)
 // Slot connected to the login button
 void MainWindow::on_KirjauduButton_clicked()
 {
-<<<<<<< HEAD
-    ui->errorLabel->setVisible(false); // piilota vanha virhe
-
-    username = ui->user->text().trimmed();
-    QString password = ui->password->text();
-
-    // Testaa kovakoodatut tunnukset
-    if (username == VALID_ADMINUSER && password == VALID_ADMINPASS) {
-        ui->errorLabel->setVisible(false);
-        selectTimer = new QTimer(this);
-        connect(selectTimer, &QTimer::timeout, this, &MainWindow::openAdminWindow);
-        selectTimer->setSingleShot(true);
-        selectTimer->start(1000);
-    }
-    else if (username == VALID_USERNAME && password == VALID_PASSWORD) {
-        ui->errorLabel->setVisible(false);
-        selectTimer = new QTimer(this);
-        connect(selectTimer, &QTimer::timeout, this, &MainWindow::openSelectWindow);
-        selectTimer->setSingleShot(true);
-        selectTimer->start(1000);
-    } else {
-        ui->errorLabel->setText("Virheellinen käyttäjätunnus tai salasana");
-        ui->errorLabel->setVisible(true);
-
-        ui->password->clear();
-        ui->password->setFocus();
-    }
-=======
     ui->errorLabel->setVisible(false);
     
     // Read and trim user input
@@ -180,7 +155,7 @@ void MainWindow::on_KirjauduButton_clicked()
     
     // Send login request to backend
     api->login(idCard, pin);
->>>>>>> main
+
 }
 
 // Custom paint event to draw the background image
@@ -201,12 +176,4 @@ void MainWindow::paintEvent(QPaintEvent *)
     painter.drawPixmap(rect(), bg);
 }
 
-//adminlogin ikkunan avaaminen, sama kuin yllä
-void MainWindow::openAdminWindow()
-{
-    adminLogIn = new adminwindow(username, nullptr);
-    adminLogIn->setAttribute(Qt::WA_DeleteOnClose);
-    adminLogIn->showMaximized();
-    this->close();
-}
 

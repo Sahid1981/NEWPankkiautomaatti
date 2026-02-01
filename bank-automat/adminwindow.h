@@ -1,6 +1,7 @@
 #ifndef ADMINWINDOW_H
 #define ADMINWINDOW_H
 
+#include "apiclient.h"
 #include <QWidget>
 
 namespace Ui {
@@ -12,12 +13,16 @@ class adminwindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit adminwindow(QString user, QWidget *parent = nullptr);
+    explicit adminwindow(int idAccount, const QString& idUser, const QString& fName, ApiClient* api, QWidget *parent = nullptr);
     ~adminwindow();
 
 private:
     Ui::adminwindow *ui;
-    QString user;
+    //QString user;
+    ApiClient* m_api = nullptr;
+    int m_idAccount = 0;
+    QString m_idUser;
+    QString m_fName;
 
     class userdata *userData;
     class accountsdata *accountsData;
@@ -38,6 +43,8 @@ private slots:
     void on_btnLokitHae_clicked();
     void on_btnLokitLowBar_clicked();
     void on_btnLogOutLowBar_2_clicked();
+    void on_btnKayttajaLuoUusi_clicked();
+    void on_btnKayttajaHae_clicked();
 };
 
 #endif // ADMINWINDOW_H

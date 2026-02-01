@@ -8,10 +8,11 @@ class user
 {
 public:
     user();
-    QString iduser;
-    QString fname;
-    QString lname;
-    QString streetaddress;
+    QString idUser;
+    QString firstName;
+    QString lastName;
+    QString streetAddress;
+    QString role;
     static user mapJson(const QJsonObject &json);
 };
 

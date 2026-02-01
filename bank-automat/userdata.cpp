@@ -8,8 +8,8 @@
 userdata::userdata(QObject *parent) : QObject(parent) {
     tableModel = new QStandardItemModel(this);
     tableModel->setRowCount(0);
-    tableModel->setColumnCount(4);
-    tableModel->setHorizontalHeaderLabels({"KäyttäjäID", "Etunimi", "Sukunimi", "Osoite"});
+    tableModel->setColumnCount(5);
+    tableModel->setHorizontalHeaderLabels({"KäyttäjäID", "Etunimi", "Sukunimi", "Osoite", "Rooli"});
 }
 
 void userdata::setUserData(const QByteArray &newUserData)
@@ -17,17 +17,17 @@ void userdata::setUserData(const QByteArray &newUserData)
     userDataList.clear();
     userDataArray = newUserData;
     QJsonDocument json_doc = QJsonDocument::fromJson(userDataArray);
-    QJsonArray json_array=json_doc.array();
 
-    //QVector<user> loglist;
-    for (const QJsonValue &value : json_array) {
-        //jsonista c++ objektiksi
-        if (value.isObject()) {
-            user userData = user::mapJson(value.toObject());
-            userDataList.append(userData);
+    if(json_doc.isArray()) {
+        QJsonArray json_array=json_doc.array();
+        for (const QJsonValue &value : json_array) {
+            userDataList.append(user::mapJson(value.toObject()));
         }
     }
-    //nollataan varmuuden vuoksi
+    else if (json_doc.isObject()) {
+        userDataList.append(user::mapJson(json_doc.object()));
+    }
+
     tableModel->setRowCount(0);
 
     updateModel();
@@ -40,17 +40,18 @@ void userdata::updateModel()
 
     for (int row = 0; row < userDataList.size(); row++) {
         const user &user = userDataList[row];
-        QStandardItem *idUserItem = new QStandardItem(user.iduser);
-        idUserItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        tableModel->setItem(row,0, idUserItem);
-        QStandardItem *fNameItem = new QStandardItem(user.fname);
-        fNameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        tableModel->setItem(row,1, fNameItem);
-        QStandardItem *lNameItem = new QStandardItem(user.lname);
-        lNameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        tableModel->setItem(row,2, lNameItem);
-        QStandardItem *addressItem = new QStandardItem(user.streetaddress);
-        addressItem->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        tableModel->setItem(row,3, addressItem);
+
+        QList<QStandardItem*> rowItems;
+        rowItems <<new QStandardItem(user.idUser)
+                 <<new QStandardItem(user.firstName)
+                 <<new QStandardItem(user.lastName)
+                 <<new QStandardItem(user.streetAddress)
+                 <<new QStandardItem(user.role);
+
+        for (auto item : rowItems) {
+            item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+        }
+
+        tableModel->appendRow(rowItems);
     }
 }

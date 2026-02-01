@@ -9,7 +9,6 @@
 #define MAINWINDOW_H
 
 #include "accountselect.h"
-#include "adminwindow.h"
 #include <QMainWindow>
 #include <QTimer>
 #include <QAction>
@@ -28,58 +27,23 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    
-    public:
+
+public:
     // Constructor / destructor
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-<<<<<<< HEAD
-
-private:
-    Ui::MainWindow *ui;
-
-    //käytetään aloitusruudun näyttämiseen
-    QTimer *splashTimer;
-    bool isSplashScreen;
-
-    //select/admin ruudulle siirtymisen timer ja username
-    QTimer *selectTimer;
-    accountselect *accountSelectWindow;
-    adminwindow *adminLogIn;
-    QString username;
-
-    //näyttää tai piilottaa pääruudun tekstit ja napit
-    void setMainControlsVisible(bool visible);
-
-    //testi tunnukset
-    const QString VALID_USERNAME = "user";
-    const QString VALID_PASSWORD = "pass";
-
-    //Admin testitunnukset
-    const QString VALID_ADMINUSER = "admin";
-    const QString VALID_ADMINPASS = "pass";
-
-private slots:
-    void showMainScreen();
-    void on_KirjauduButton_clicked();
-    void openSelectWindow();
-    void openAdminWindow();
 
 protected:
-=======
-    
-    protected:
     // Overridden paint event to draw custom background images
->>>>>>> main
     void paintEvent(QPaintEvent *event) override;
-    
-    private slots:
+
+private slots:
     // Called when the splash screen timer expires
     void showMainScreen();
     // Called when the login button is clicked or Enter is pressed
     void on_KirjauduButton_clicked();
-    
-    private:
+
+private:
     // Action used to toggle password visibility in the PIN field
     QAction* togglePasswordAction = nullptr;
     // Tracks whether the password is currently visible
@@ -87,17 +51,17 @@ protected:
 
     // Pointer to the UI elements generated from mainwindow.ui
     Ui::MainWindow *ui;
-    
+
     // True while the splash screen is being displayed
     bool isSplashScreen;
     // Timer controlling the splash screen duration
     QTimer *splashTimer;
-    
+
     // API client responsible for backend communication
     ApiClient* api = nullptr;
     // Account selection dialog shown after successful login
     accountselect* accountSelectWindow = nullptr;
-    
+
     // Shows or hides the login controls
     void setMainControlsVisible(bool visible);
 };

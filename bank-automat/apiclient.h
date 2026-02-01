@@ -52,6 +52,15 @@ struct LogItemDto {
     double balanceChange = 0.0; // Amount changed (+ / -)
 };
 
+// // Data Transfer Object for getting single user
+// struct UserItemDto {
+//     QString iduser;
+//     QString fname;
+//     QString lname;
+//     QString streetaddress;
+//     QString role;
+// };
+
 // ApiClient is responsible for all HTTP communication with the backend
 // It wraps QNetworkAccessManager and exposes high-level API operations (login, logout, balance, withdrawals, logs) via Qt signals
 class ApiClient : public QObject
@@ -78,6 +87,9 @@ public:
     void withdrawCredit(int idAccount, double amount);
     void getAccountLogs(int idAccount);
 
+    void getUser(QString idUser);
+    void addUser(QString idUser, QString fname, QString lname, QString streetaddress, QString role);
+
 signals:
     // Emitted when login succeeds and all required data is parsed
     void loginSucceeded(const LoginResultDto& result);
@@ -90,6 +102,10 @@ signals:
     void withdrawSucceeded(int idAccount, double newBalance);
     // Emitted when account transaction logs are received
     void logsReceived(int idAccount, const QVector<LogItemDto>& logs);
+
+    //emitted when user is received
+    //void userReceived(QString idUser, QString fname, QString lname, QString streetaddress, QString role);
+    void userReceived(const QByteArray& userInfo);
 
     // Emitted whenever any API request fails
     void requestFailed(const ApiError& error);

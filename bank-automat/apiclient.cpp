@@ -17,7 +17,9 @@
 ApiClient::ApiClient(QObject* parent)
     : QObject(parent),
     // Default backend address (local development)
-    m_baseUrl(QUrl("http://127.0.0.1:3000"))
+    //m_baseUrl(QUrl("http://127.0.0.1:3000"))
+    //Real IP
+    m_baseUrl(QUrl("http://86.50.23.239:3000"))
 {
 }
 
@@ -223,6 +225,12 @@ void ApiClient::sendNoBody(const QString& method, const QString& path)
             emit logsReceived(idAccount, items);
         }
 
+        // Special-case: GET /users/{idUser} returns user data as an object
+        if (path.startsWith("/users/")) {
+            QByteArray o = doc.toJson(QJsonDocument::Compact);
+            emit userReceived(o);
+        }
+
         reply->deleteLater();
     });
 }
@@ -301,6 +309,16 @@ void ApiClient::getBalance(int idAccount)
 void ApiClient::getAccountLogs(int idAccount)
 {
     sendNoBody("GET", QString("/atm/%1/logs").arg(idAccount));
+}
+
+void ApiClient::getUser(QString idUser)
+{
+    sendNoBody("GET", QString("/users/%1").arg(idUser));
+}
+
+void ApiClient::addUser(QString idUser, QString fname, QString lname, QString streetaddress, QString role)
+{
+    sendJson("POST", QString("/users"), QJsonObject{{"idUser", idUser},{"fname", fname},{"lname",lname},{"streetAddress", streetaddress}, {"role", role}});
 }
 
 // POST /atm/{idAccount}/withdraw with { amount }
