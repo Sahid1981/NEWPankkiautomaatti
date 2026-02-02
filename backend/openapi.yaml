@@ -144,6 +144,15 @@ components:
           minimum: 0.01
           example: 40.00
 
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error"
+        message:
+          type: string
+          example: "Error message"
 
 paths:
   /auth/login:
