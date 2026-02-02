@@ -56,7 +56,9 @@ void logs::updateModel()
         idlog->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         QStandardItem *aika = new QStandardItem(event.time);
         aika->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange));
+        // QString balanceDot = QString::asprintf("%.2f €", event.balanceChange);
+        // QString balanceComma = balanceDot.replace('.',',');
+        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange).replace('.',','));
         muutos->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tableModel->appendRow({idlog, aika, muutos});
     }
@@ -81,7 +83,9 @@ void logs::updateModelAdmin()
         idlog->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         QStandardItem *aika = new QStandardItem(event.time);
         aika->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange));
+        // QString balanceDot = QString::asprintf("%.2f €", event.balanceChange);
+        // QString balanceComma = balanceDot.replace('.',',');
+        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange).replace('.',','));
         muutos->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tableModelAdmin->appendRow({idlog, aika, muutos});
     }

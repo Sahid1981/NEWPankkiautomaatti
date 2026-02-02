@@ -44,8 +44,8 @@ void accountsdata::updateModel()
         QList<QStandardItem*> rowItems;
         rowItems <<new QStandardItem(QString::number(accounts.idAccount))
                  <<new QStandardItem(accounts.idUser)
-                 <<new QStandardItem(QString::asprintf("%.2f €", accounts.balance))
-                 <<new QStandardItem(QString::asprintf("%.2f €", accounts.creditLimit));
+                 <<new QStandardItem(QString::asprintf("%.2f €", accounts.balance).replace('.',','))
+                 <<new QStandardItem(QString::asprintf("%.2f €", accounts.creditLimit).replace('.',','));
 
         rowItems[0]->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         rowItems[1]->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);

@@ -55,10 +55,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Create the API client used for backend communication
     api = new ApiClient(this);
-    //Test IP
-    //api->setBaseUrl(QUrl("http://127.0.0.1:3000"));
-    //Real IP
-    api->setBaseUrl(QUrl("http://86.50.23.239:3000"));
 
     // Handle successful login
     connect(api, &ApiClient::loginSucceeded, this,

@@ -21,6 +21,7 @@ ApiClient::ApiClient(QObject* parent)
 {
     QString db_url = getEnvValue("DB_IP");
     m_baseUrl = (QUrl(db_url));
+    qDebug() << "Url: " << m_baseUrl.toString();
 }
 
 
@@ -325,18 +326,19 @@ QJsonDocument ApiClient::readJson(QNetworkReply* reply, ApiError& errOut)
     return doc;
 }
 
+// Used to read from .env. Currently only IP is stored there.
 QString ApiClient::getEnvValue(QString secret)
 {
     QFile file(QCoreApplication::applicationDirPath() + "/.env");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Opening .env failed";
+        qDebug() << "Opening .env failed. looked at" << QCoreApplication::applicationDirPath();
         // returns empty to prevent crashing
         return "";
     }
     QTextStream in(&file);
     while(!in.atEnd()) {
         QString line = in.readLine();
-        if (line.startsWith(secret + "=")) {
+        if (line.contains(secret + "=")) {
             QString secretKey = line.split("=").at(1).trimmed();
             return secretKey;
         }
