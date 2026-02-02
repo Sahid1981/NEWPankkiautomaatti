@@ -13,16 +13,15 @@ class adminwindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit adminwindow(int idAccount, const QString& idUser, const QString& fName, ApiClient* api, QWidget *parent = nullptr);
+    explicit adminwindow(QString idUser, ApiClient* api, QWidget *parent = nullptr);
+
     ~adminwindow();
 
 private:
     Ui::adminwindow *ui;
     //QString user;
     ApiClient* m_api = nullptr;
-    int m_idAccount = 0;
     QString m_idUser;
-    QString m_fName;
 
     class userdata *userData;
     class accountsdata *accountsData;

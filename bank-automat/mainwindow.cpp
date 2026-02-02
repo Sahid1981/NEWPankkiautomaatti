@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QLineEdit>
+#include "adminwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QPainter>
@@ -66,10 +67,18 @@ MainWindow::MainWindow(QWidget *parent)
             // Hide any previous error message
             ui->errorLabel->setVisible(false);
             
-            // Open the account selection window
-            accountSelectWindow = new accountselect(loginResult, api, nullptr);
-            accountSelectWindow->setAttribute(Qt::WA_DeleteOnClose);
-            accountSelectWindow->showMaximized();
+            if (loginResult.role == "admin") {
+                // Open adminwindow
+                adminWindow = new adminwindow(loginResult.idUser, api, nullptr);
+                adminWindow->setAttribute(Qt::WA_DeleteOnClose);
+                adminWindow->showMaximized();
+            }
+            else {
+                // Open the account selection window
+                accountSelectWindow = new accountselect(loginResult, api, nullptr);
+                accountSelectWindow->setAttribute(Qt::WA_DeleteOnClose);
+                accountSelectWindow->showMaximized();
+            }
             
             // Close the login window
             this->close();

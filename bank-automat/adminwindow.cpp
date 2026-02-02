@@ -8,12 +8,10 @@
 #include <QProcess>
 #include <qpainter.h>
 
-adminwindow::adminwindow(int idAccount, const QString &idUser, const QString &fName, ApiClient *api, QWidget *parent)
+adminwindow::adminwindow(QString idUser, ApiClient *api, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::adminwindow),
-    m_idAccount(idAccount),
     m_idUser(idUser),
-    m_fName(fName),
     m_api(api)
 {
     ui->setupUi(this);

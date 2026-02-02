@@ -42,9 +42,6 @@ accountselect::accountselect(
     // Show only the buttons that correspond to existing accounts
     ui->btnSelectDebit->setVisible(hasDebit);
     ui->btnSelectCredit->setVisible(hasCredit);
-    if (hasAdmin == "admin"){
-        ui->btnSelectAdmin->setVisible(true);
-    }
 
 }
 
@@ -69,10 +66,10 @@ void accountselect::on_btnSelectCredit_clicked()
 }
 
 // Called automatically when the Admin button is clicked
-void accountselect::on_btnSelectAdmin_clicked()
-{
-    openAdminWindow();
-}
+// void accountselect::on_btnSelectAdmin_clicked()
+// {
+//     openAdminWindow();
+// }
 
 // Opens the main account window based on the selected account type
 void accountselect::openAccountWindow()
@@ -94,26 +91,6 @@ void accountselect::openAccountWindow()
     accountWindow->setAttribute(Qt::WA_DeleteOnClose);
     // Show the account window in full screen
     accountWindow->showMaximized();
-    // Close this account selection dialog
-    close();
-}
-
-void accountselect::openAdminWindow()
-{
-    //Some of this data probablys is not needed, but transferred just in case to match account window
-    const int idAccount = accountIdByType.value(selectedAccountType, -1);
-    // Create the admin window
-    adminwindow* admin = new adminwindow(
-        idAccount,
-        m_login.idUser,
-        m_login.fName,
-        m_api,
-        nullptr
-        );
-    // Automatically delete the window object when it is closed
-    admin->setAttribute(Qt::WA_DeleteOnClose);
-    // Show the admin window in full screen
-    admin->showMaximized();
     // Close this account selection dialog
     close();
 }

@@ -9,7 +9,7 @@
 #define ACCOUNTSELECT_H
 
 #include "account.h"
-#include "adminwindow.h"
+//#include "adminwindow.h"
 #include <QDialog>
 #include <QMap>
 
@@ -48,7 +48,6 @@ class accountselect : public QDialog
     // Slot called when the Credit button is clicked
     void on_btnSelectCredit_clicked();
     
-    void on_btnSelectAdmin_clicked();
 
 private:
     // Pointer to the UI elements generated from accountselect.ui

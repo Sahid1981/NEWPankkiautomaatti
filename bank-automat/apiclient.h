@@ -52,15 +52,6 @@ struct LogItemDto {
     double balanceChange = 0.0; // Amount changed (+ / -)
 };
 
-// // Data Transfer Object for getting single user
-// struct UserItemDto {
-//     QString iduser;
-//     QString fname;
-//     QString lname;
-//     QString streetaddress;
-//     QString role;
-// };
-
 // ApiClient is responsible for all HTTP communication with the backend
 // It wraps QNetworkAccessManager and exposes high-level API operations (login, logout, balance, withdrawals, logs) via Qt signals
 class ApiClient : public QObject
