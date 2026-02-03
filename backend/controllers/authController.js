@@ -55,14 +55,20 @@ async function login(req, res, next) {
 
             if (newAttempts >= 3) {
                 // Lock the card
-                await pool.execute('CALL sp_lock_card(?)', [idCard]);
+                await pool.execute('CALL sp_card_lock(?)', [idCard]);
                 throw new AppError('Card is locked due to multiple failed PIN attempts', 403);
             }
 
-            throw new AppError('Invalid credentials. Attempts: ${3 - newAttempts}', 401);
+            throw new AppError(`Invalid credentials. Attempts: ${3 - newAttempts}`, 401);
 
         
         }
+
+        // PIN correct - reset pin attempts
+        await pool.execute(
+            'UPDATE cards SET pin_attempts = 0 WHERE idcard = ?',
+            [idCard]
+        );
 
         // Get user info including role
         const [userResults] = await pool.execute('CALL sp_read_user_info(?)', [card.iduser]);
