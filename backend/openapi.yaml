@@ -408,6 +408,23 @@ paths:
           description: Admin-oikeudet vaaditaan
 
   /users:
+    get:
+      tags: [Users (Admin)]
+      summary: Hae kaikki käyttäjät
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Käyttäjälista
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "403":
+          description: Admin-oikeudet vaaditaan
+
     post:
       tags: [Users (Admin)]
       summary: Luo uusi käyttäjä
@@ -563,6 +580,24 @@ paths:
       responses:
         "200":
           description: Kortin lukitus avattu
+        "403":
+          description: Admin-oikeudet vaaditaan
+
+  /accounts:
+    get:
+      tags: [Accounts (Admin)]
+      summary: Hae kaikki tilit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Tililista
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
         "403":
           description: Admin-oikeudet vaaditaan
 
