@@ -12,6 +12,8 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QAction>
+#include <QProcess>
+#include <QCoreApplication>
 
 #include "apiclient.h"
 
@@ -44,6 +46,10 @@ class MainWindow : public QMainWindow
     void on_KirjauduButton_clicked();
     
     private:
+    QTimer* pinTimeoutTimer = nullptr;
+
+    void armOrResetPinTimeout();
+    void restartApplication();
     // Action used to toggle password visibility in the PIN field
     QAction* togglePasswordAction = nullptr;
     // Tracks whether the password is currently visible
