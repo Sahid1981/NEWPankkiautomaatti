@@ -175,7 +175,7 @@ adminwindow::adminwindow(QString idUser, ApiClient *api, QWidget *parent)
 
     connect(m_api, &ApiClient::allCardsReceived, this, [this](QByteArray allCards) {
         cardData->setCardData(allCards);
-        ui->lineKortitIdcard->clear();
+        ui->lineKortitIdCard->clear();
         ui->lineKortitLukossa->clear();
         ui->lineKortitPinYritykset->clear();
         ui->lineKortitIdUser->clear();
@@ -183,10 +183,19 @@ adminwindow::adminwindow(QString idUser, ApiClient *api, QWidget *parent)
 
     connect(m_api, &ApiClient::cardReceived, this, [this](QByteArray card) {
         cardData->setCardData(card);
-        ui->lineKortitIdcard->clear();
+        ui->lineKortitIdCard->clear();
         ui->lineKortitLukossa->clear();
         ui->lineKortitPinYritykset->clear();
         ui->lineKortitIdUser->clear();
+    });
+
+    connect(m_api, &ApiClient::cardCreated, this, [this](QByteArray card) {
+        cardData->setCardData(card);
+        ui->lineKortitIdCard->clear();
+        ui->lineKortitLukossa->clear();
+        ui->lineKortitPinYritykset->clear();
+        ui->lineKortitIdUser->clear();
+        ui->lineKortitPIN->clear();
         qDebug() << "Signal received";
     });
 
@@ -389,7 +398,12 @@ void adminwindow::on_btnTiliHaeKaikki_clicked()
 
 void adminwindow::on_btnKorttiLuoUusi_clicked()
 {
-
+    QString idCard = ui->lineKortitIdCard->text().trimmed();
+    QString idUser = ui->lineKortitIdUser->text().trimmed();
+    QString PIN = ui->lineKortitPIN->text().trimmed();
+    if (!idCard.isEmpty() && !idUser.isEmpty() && !PIN.isEmpty()) {
+        m_api->addCard(idCard, idUser, PIN);
+    }
 }
 
 
@@ -401,7 +415,7 @@ void adminwindow::on_btnKorttiHaeKaikki_clicked()
 
 void adminwindow::on_btnKorttiHaeKortti_clicked()
 {
-    QString idCard = ui->lineKortitIdcard->text().trimmed();
+    QString idCard = ui->lineKortitIdCard->text().trimmed();
     if (!idCard.isEmpty()) {
         m_api->getCard(idCard);
     }

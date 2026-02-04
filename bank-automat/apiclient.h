@@ -105,11 +105,10 @@ public:
     void updateCreditLimit(int idAccount, double creditLimit);
     void deleteAccount(int idAccount);
 
-    //void addCard
-
     void getAllCards();
     void getCard(QString idCard);
     void getCardAccount(QString idCard);
+    void addCard(QString idCard, QString idUser, QString cardPIN);
 
     void getAdminLogs(int idAccount);
 
@@ -154,6 +153,9 @@ signals:
     void cardReceived(const QByteArray& allCards);
     // Emitted when account(s) linked to card is received
     void cardAccountReceived(const QByteArray& cardAccount);
+    // Emitted when account is created
+    void cardCreated(const QByteArray& cardData);
+
 
     // Emitted when all logs are received
     void adminLogsReceived(const QByteArray& adminLogs);

@@ -179,20 +179,33 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
         }
 
         // Special case for creating account
-        if (path.startsWith("/account") && method == "POST") {
+        if (path.startsWith("/accounts") && method == "POST") {
             QByteArray responseData = doc.toJson(QJsonDocument::Compact);
             emit accountCreated(responseData);
         }
 
         // Special case for updating creditlimit
-        if (path.startsWith("/account") && method == "PUT") {
+        if (path.startsWith("/accounts") && method == "PUT") {
             int idFromPath = path.section('/',2,2).toInt();
             emit accountCreditUpdated(idFromPath);
         }
 
         // Special case for deleting an account
-        if (path.startsWith("/account") && method == "DELETE") {
+        if (path.startsWith("/accounts") && method == "DELETE") {
             emit accountDeleted();
+        }
+
+        qDebug() << "--- Network Response Debug ---";
+        qDebug() << "Path:" << path;
+        qDebug() << "Method:" << method;
+        qDebug() << "Doc is empty?" << doc.isEmpty();
+        qDebug() << "------------------------------";
+
+        if (path.startsWith("/cards") && method == "POST") {
+            QByteArray responseData = doc.toJson(QJsonDocument::Compact);
+
+            qDebug() << "Server returned:" << responseData;
+            emit cardCreated(responseData);
         }
 
         reply->deleteLater();
@@ -456,6 +469,12 @@ void ApiClient::updateCreditLimit(int idAccount, double creditLimit)
 void ApiClient::deleteAccount(int idAccount)
 {
     sendJson("DELETE", QString("/accounts/%1").arg(idAccount), QJsonObject{{}});
+}
+
+void ApiClient::addCard(QString idCard, QString idUser, QString cardPIN)
+{
+    sendJson("POST", QString("/cards"), QJsonObject{{"idCard", idCard},{"idUser", idUser},{"cardPIN", cardPIN}});
+    qDebug() << "Client Reached";
 }
 
 void ApiClient::getAllCards()

@@ -2778,7 +2778,7 @@
           <property name="geometry">
            <rect>
             <x>540</x>
-            <y>160</y>
+            <y>200</y>
             <width>121</width>
             <height>51</height>
            </rect>
@@ -2791,7 +2791,7 @@
           <property name="geometry">
            <rect>
             <x>540</x>
-            <y>230</y>
+            <y>270</y>
             <width>51</width>
             <height>51</height>
            </rect>
@@ -2804,7 +2804,7 @@
           <property name="geometry">
            <rect>
             <x>610</x>
-            <y>230</y>
+            <y>270</y>
             <width>51</width>
             <height>51</height>
            </rect>
@@ -2830,7 +2830,7 @@
           <property name="geometry">
            <rect>
             <x>540</x>
-            <y>300</y>
+            <y>340</y>
             <width>51</width>
             <height>51</height>
            </rect>
@@ -2844,7 +2844,7 @@ linkitys</string>
           <property name="geometry">
            <rect>
             <x>610</x>
-            <y>300</y>
+            <y>340</y>
             <width>51</width>
             <height>51</height>
            </rect>
@@ -2854,7 +2854,7 @@ linkitys</string>
 linkitys</string>
           </property>
          </widget>
-         <widget class="QLineEdit" name="lineKortitIdcard">
+         <widget class="QLineEdit" name="lineKortitIdCard">
           <property name="geometry">
            <rect>
             <x>20</x>
@@ -2930,6 +2930,35 @@ kortti</string>
             <width>80</width>
             <height>22</height>
            </rect>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineKortitPIN">
+          <property name="geometry">
+           <rect>
+            <x>580</x>
+            <y>160</y>
+            <width>81</width>
+            <height>22</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_3">
+          <property name="geometry">
+           <rect>
+            <x>540</x>
+            <y>160</y>
+            <width>31</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>PIN: </string>
           </property>
          </widget>
         </widget>
