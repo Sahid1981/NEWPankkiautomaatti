@@ -56,6 +56,7 @@ private slots:
     void on_btnKorttiHaeKaikki_clicked();
     void on_btnKorttiHaeKortti_clicked();
     void on_btnKorttiPoista_clicked();
+    void on_btnKorttiPaivitaPIN_clicked();
 };
 
 #endif // ADMINWINDOW_H

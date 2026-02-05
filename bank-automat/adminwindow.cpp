@@ -203,6 +203,12 @@ adminwindow::adminwindow(QString idUser, ApiClient *api, QWidget *parent)
         ui->lineKortitIdCard->clear();
     });
 
+    connect(m_api, &ApiClient::PINUpdated, this, [this](QString idCard) {
+        m_api->getCard(idCard);
+        ui->lineKortitIdCard->clear();
+        ui->lineKortitPIN->clear();
+    });
+
     connect(m_api, &ApiClient::adminLogsReceived, this, [this](QByteArray adminLogs) {
         logData->setLog(adminLogs);
         //clears input
@@ -431,6 +437,16 @@ void adminwindow::on_btnKorttiPoista_clicked()
     QString idCard = ui->lineKortitIdCard->text().trimmed();
     if (!idCard.isEmpty()) {
         m_api->deleteCard(idCard);
+    }
+}
+
+
+void adminwindow::on_btnKorttiPaivitaPIN_clicked()
+{
+    QString idCard = ui->lineKortitIdCard->text().trimmed();
+    QString PIN = ui->lineKortitPIN->text().trimmed();
+    if (!idCard.isEmpty() && !PIN.isEmpty()) {
+        m_api->updatePIN(idCard, PIN);
     }
 }
 

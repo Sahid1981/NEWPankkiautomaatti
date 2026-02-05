@@ -206,6 +206,11 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
             emit cardDeleted();
         }
 
+        if (path.startsWith("/cards/") && path.endsWith("/pin") && method == "PUT") {
+            QString idFromPath = path.section('/',2,2);
+            emit PINUpdated(idFromPath);
+        }
+
         reply->deleteLater();
     });
 }
@@ -313,6 +318,7 @@ void ApiClient::sendNoBody(const QString& method, const QString& path)
             emit allCardsReceived(cards);
         }
 
+        // Special-case: Create new card
         if (path.startsWith("/cardaccount/") && method == "GET") {
             QByteArray cardAccount = doc.toJson(QJsonDocument::Compact);
             emit cardAccountReceived(cardAccount);
@@ -477,6 +483,11 @@ void ApiClient::addCard(QString idCard, QString idUser, QString cardPIN)
 void ApiClient::deleteCard(QString idCard)
 {
     sendJson("DELETE", QString("/cards/%1").arg(idCard), QJsonObject{{}});
+}
+
+void ApiClient::updatePIN(QString idCard, QString PIN)
+{
+    sendJson("PUT", QString("/cards/%1/pin").arg(idCard), QJsonObject{{"cardPIN",PIN}});
 }
 
 void ApiClient::getAllCards()
