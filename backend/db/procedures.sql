@@ -7,6 +7,8 @@
 -- CREATE USER
 -- example CALL sp_create_user(iduser, fname, lname,streetaddress);
 
+DROP PROCEDURE IF EXISTS sp_create_user;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_create_user(
@@ -46,6 +48,8 @@ DELIMITER ;
 
 -- DELETE USER
 -- example CALL sp_delete_user(iduser);
+
+DROP PROCEDURE IF EXISTS sp_delete_user;
 
 DELIMITER $$
 
@@ -104,6 +108,8 @@ DELIMITER ;
 -- READ USER INFO
 -- example CALL sp_read_user_info(iduser);
 
+DROP PROCEDURE IF EXISTS sp_read_user_info;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_read_user_info(
@@ -133,8 +139,24 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- READ ALL USERS
+-- example CALL sp_read_all_users();
+
+DROP PROCEDURE IF EXISTS sp_read_all_users;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_read_all_users()
+BEGIN
+  SELECT iduser, fname, lname, streetaddress, role
+  FROM users;
+END$$
+DELIMITER ;
+
 -- UPDATE USER INFO
 -- example CALL sp_update_user_info(iduser, fname, lname, streetaddress);
+
+DROP PROCEDURE IF EXISTS sp_update_user_info;
 
 DELIMITER $$
 
@@ -192,6 +214,8 @@ DELIMITER ;
 -- ADD ACCOUNT
 -- example CALL sp_add_account(iduser, balance, creditlimit);
 
+DROP PROCEDURE IF EXISTS sp_add_account;
+
 DELIMITER $$
 CREATE PROCEDURE sp_add_account(
   IN p_iduser VARCHAR(45),
@@ -234,6 +258,8 @@ DELIMITER ;
 
 -- DELETE ACCOUNT
 -- example CALL sp_delete_account(idaccount);
+
+DROP PROCEDURE IF EXISTS sp_delete_account;
 
 DELIMITER $$
 
@@ -288,6 +314,8 @@ DELIMITER ;
 -- READ ACCOUNT INFO
 -- example CALL sp_read_account_info(idaccount);
 
+DROP PROCEDURE IF EXISTS sp_read_account_info;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_read_account_info(
@@ -317,12 +345,28 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- READ ALL ACCOUNTS
+-- example CALL sp_read_all_accounts();
+
+DROP PROCEDURE IF EXISTS sp_read_all_accounts;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_read_all_accounts()
+BEGIN
+  SELECT idaccount, iduser, balance, creditlimit
+  FROM accounts;
+END$$
+DELIMITER ;
+
 -- ========================================
 -- KORTTIEN HALLINTA (Card Management)
 -- ========================================
 
 -- CREATE CARD
 -- example CALL sp_create_card(idcard, iduser, hashed_pin);
+
+DROP PROCEDURE IF EXISTS sp_create_card;
 
 DELIMITER $$
 
@@ -362,8 +406,8 @@ BEGIN
   END IF;
 
   -- Insert new card (PIN is already hashed by backend)
-  INSERT INTO cards (idcard, cardPIN, iduser, is_locked)
-  VALUES (p_idcard, p_cardpin, p_iduser, 0);
+  INSERT INTO cards (idcard, cardPIN, iduser, is_locked, pin_attempts)
+  VALUES (p_idcard, p_cardpin, p_iduser, 0, 0);
 
   COMMIT;
 END$$
@@ -371,6 +415,8 @@ DELIMITER ;
 
 -- READ CARD INFO
 -- example CALL sp_read_card_info(idcard);
+
+DROP PROCEDURE IF EXISTS sp_read_card_info;
 
 DELIMITER $$
 
@@ -391,7 +437,7 @@ BEGIN
   END IF;
 
   -- Return card info 
-  SELECT idcard, cardPIN, iduser, is_locked
+  SELECT idcard, cardPIN, iduser, is_locked, pin_attempts
   FROM cards
   WHERE idcard = p_idcard;
 END$$
@@ -399,6 +445,8 @@ DELIMITER ;
 
 -- READ ALL CARDS
 -- example CALL sp_read_all_cards();
+
+DROP PROCEDURE IF EXISTS sp_read_all_cards;
 
 DELIMITER $$
 
@@ -412,6 +460,8 @@ DELIMITER ;
 
 -- UPDATE CARD PIN
 -- example CALL sp_update_card_pin(idcard, new_hashed_pin);
+
+DROP PROCEDURE IF EXISTS sp_update_card_pin;
 
 DELIMITER $$
 
@@ -448,6 +498,8 @@ DELIMITER ;
 -- GET CARD INFO (with linked accounts)
 -- example CALL sp_get_card_info(idcard);
 
+DROP PROCEDURE IF EXISTS sp_get_card_info;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_get_card_info(
@@ -481,6 +533,8 @@ DELIMITER ;
 
 -- ADD CARD TO ACCOUNT
 -- example CALL sp_card_to_account(idcard, idaccount);
+
+DROP PROCEDURE IF EXISTS sp_card_to_account;
 
 DELIMITER $$
 CREATE PROCEDURE sp_card_to_account(
@@ -552,6 +606,8 @@ DELIMITER ;
 -- REMOVE CARD FROM ACCOUNT
 -- example CALL sp_remove_card_from_account(idcard, idaccount);
 
+DROP PROCEDURE IF EXISTS sp_remove_card_from_account;
+
 DELIMITER $$
 CREATE PROCEDURE sp_remove_card_from_account(
   IN p_idcard VARCHAR(45),
@@ -584,6 +640,8 @@ DELIMITER ;
 
 -- UPDATE CARD LINKED ACCOUNT
 -- example CALL sp_update_card_linked_account(idcard, old_idaccount, new_idaccount);
+
+DROP PROCEDURE IF EXISTS sp_update_card_linked_account;
 
 DELIMITER $$
 CREATE PROCEDURE sp_update_card_linked_account( 
@@ -645,6 +703,8 @@ DELIMITER ;
 -- DELETE CARD
 -- example CALL sp_delete_card(idcard);
 
+DROP PROCEDURE IF EXISTS sp_delete_card;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_delete_card(
@@ -681,6 +741,8 @@ DELIMITER ;
 -- CARD LOCK
 -- example CALL sp_card_lock(idcard);
 
+DROP PROCEDURE IF EXISTS sp_card_lock;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_card_lock(
@@ -692,7 +754,7 @@ BEGIN
 
   -- Locks card 
   UPDATE cards
-  SET is_locked = 1
+  SET is_locked = 1, pin_attempts = 0
   WHERE idcard = p_idcard;
 
   IF ROW_COUNT() = 0 THEN
@@ -707,6 +769,8 @@ DELIMITER ;
 -- CARD UNLOCK
 -- example CALL sp_card_unlock(idcard);
 
+DROP PROCEDURE IF EXISTS sp_card_unlock;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_card_unlock(
@@ -718,7 +782,7 @@ BEGIN
 
   -- unlock card 
   UPDATE cards
-  SET is_locked = 0
+  SET is_locked = 0, pin_attempts = 0
   WHERE idcard = p_idcard;
 
   IF ROW_COUNT() = 0 THEN
@@ -737,6 +801,8 @@ DELIMITER ;
 
 -- DEPOSIT
 -- example CALL sp_deposit(idaccount, amount);
+
+DROP PROCEDURE IF EXISTS sp_deposit;
 
 DELIMITER $$
 
@@ -782,6 +848,8 @@ DELIMITER ;
 
 -- WITHDRAW
 -- example CALL sp_withdraw(idaccount, amount);
+
+DROP PROCEDURE IF EXISTS sp_withdraw;
 
 DELIMITER $$
 
@@ -833,6 +901,8 @@ DELIMITER ;
 
 -- TRANSFER
 -- example CALL sp_transfer(idaccount_from, idaccount_to, amount);
+
+DROP PROCEDURE IF EXISTS sp_transfer;
 
 DELIMITER $$
 
@@ -913,6 +983,8 @@ DELIMITER ;
 
 -- CREDIT WITHDRAW
 -- example CALL sp_credit_withdraw(idaccount, amount);
+DROP PROCEDURE IF EXISTS sp_credit_withdraw;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_credit_withdraw (
@@ -964,6 +1036,8 @@ DELIMITER ;
 
 -- CREDIT REPAY
 -- example CALL sp_credit_repay(idaccount, amount);
+
+DROP PROCEDURE IF EXISTS sp_credit_repay;
 
 DELIMITER $$
 
@@ -1017,6 +1091,8 @@ DELIMITER ;
 -- UPDATE CREDITLIMIT
 -- example CALL sp_update_creditlimit(idaccount, creditlimit);
 
+DROP PROCEDURE IF EXISTS sp_update_creditlimit;
+
 DELIMITER $$
 CREATE PROCEDURE sp_update_creditlimit(
   IN p_idaccount INT,
@@ -1055,6 +1131,8 @@ DELIMITER ;
 
 -- READ ACCOUNT LOGS
 -- example CALL sp_read_account_logs(1);
+
+DROP PROCEDURE IF EXISTS sp_read_account_logs;
 
 DELIMITER $$
 
