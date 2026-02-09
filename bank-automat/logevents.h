@@ -8,10 +8,10 @@ class logevents
 {
 public:
     logevents();
-    int idlog;
-    int idaccount;
+    int idLog;
+    int idAccount;
     QString time;
-    double balancechange;
+    double balanceChange;
     static logevents mapJson(const QJsonObject &json);
 };
 

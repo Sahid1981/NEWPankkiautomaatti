@@ -7,6 +7,7 @@
 
 #include "accountselect.h"
 #include "account.h"
+#include "adminwindow.h"
 #include "ui_accountselect.h"
 #include <QPainter>
 #include <QPixmap>
@@ -36,10 +37,12 @@ accountselect::accountselect(
     // Check which account types the user has
     const bool hasDebit  = accountIdByType.contains("debit");
     const bool hasCredit = accountIdByType.contains("credit");
+    QString hasAdmin = loginResult.role;
     
     // Show only the buttons that correspond to existing accounts
     ui->btnSelectDebit->setVisible(hasDebit);
     ui->btnSelectCredit->setVisible(hasCredit);
+
 }
 
 // Destructor: clean up UI
@@ -61,6 +64,12 @@ void accountselect::on_btnSelectCredit_clicked()
     selectedAccountType = "credit";
     openAccountWindow();
 }
+
+// Called automatically when the Admin button is clicked
+// void accountselect::on_btnSelectAdmin_clicked()
+// {
+//     openAdminWindow();
+// }
 
 // Opens the main account window based on the selected account type
 void accountselect::openAccountWindow()
@@ -95,3 +104,6 @@ void accountselect::paintEvent(QPaintEvent *)
     // Scale and draw the image to fill the entire dialog
     painter.drawPixmap(rect(), bg);
 }
+
+
+

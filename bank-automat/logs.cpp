@@ -10,6 +10,11 @@ logs::logs(QObject *parent) : QObject(parent) {
     tableModel->setRowCount(0);
     tableModel->setColumnCount(3);
     tableModel->setHorizontalHeaderLabels({"ID", "Aika", "Muutos"});
+
+    tableModelAdmin = new QStandardItemModel(this);
+    tableModelAdmin->setRowCount(0);
+    tableModelAdmin->setColumnCount(3);
+    tableModelAdmin->setHorizontalHeaderLabels({"ID", "Aika", "Muutos"});
 }
 
 void logs::setLog(const QByteArray &newLog)
@@ -31,7 +36,10 @@ void logs::setLog(const QByteArray &newLog)
     tableModel->setRowCount(0);
     currentPage = 0;
 
+    tableModelAdmin->setRowCount(0);
+
     updateModel();
+    updateModelAdmin();
 }
 
 //Tehdään uusi metodi, kun tarvitaan sekä aloituksessa että päivittäessä, ei tule toistoa
@@ -44,11 +52,13 @@ void logs::updateModel()
 
     for (int i = start; i < end; i++) {
         const logevents &event = loglist[i];
-        QStandardItem *idlog = new QStandardItem(QString::number(event.idlog));
+        QStandardItem *idlog = new QStandardItem(QString::number(event.idLog));
         idlog->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         QStandardItem *aika = new QStandardItem(event.time);
         aika->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balancechange));
+        // QString balanceDot = QString::asprintf("%.2f €", event.balanceChange);
+        // QString balanceComma = balanceDot.replace('.',',');
+        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange).replace('.',','));
         muutos->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tableModel->appendRow({idlog, aika, muutos});
     }
@@ -59,6 +69,25 @@ void logs::updateModel()
         QStandardItem *aikaTyhja = new QStandardItem("");
         QStandardItem *muutosTyhja = new QStandardItem(QString::asprintf(""));
         tableModel->appendRow({idlogTyhja, aikaTyhja, muutosTyhja});
+    }
+}
+
+void logs::updateModelAdmin()
+{
+    //tyhjennetään ensin
+    tableModelAdmin->removeRows(0, tableModelAdmin->rowCount());
+
+    for (int row = 0; row < loglist.size(); row++) {
+        const logevents &event = loglist[row];
+        QStandardItem *idlog = new QStandardItem(QString::number(event.idLog));
+        idlog->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+        QStandardItem *aika = new QStandardItem(event.time);
+        aika->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+        // QString balanceDot = QString::asprintf("%.2f €", event.balanceChange);
+        // QString balanceComma = balanceDot.replace('.',',');
+        QStandardItem *muutos = new QStandardItem(QString::asprintf("%.2f €", event.balanceChange).replace('.',','));
+        muutos->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        tableModelAdmin->appendRow({idlog, aika, muutos});
     }
 }
 

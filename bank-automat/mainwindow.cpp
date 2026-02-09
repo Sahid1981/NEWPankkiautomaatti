@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QLineEdit>
+#include "adminwindow.h"
 #include "ui_mainwindow.h"
 #include <QApplication>
 
@@ -53,7 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Create the API client used for backend communication
     api = new ApiClient(this);
-    api->setBaseUrl(QUrl("http://127.0.0.1:3000"));
 
     // Handle successful login
     connect(api, &ApiClient::loginSucceeded, this,
@@ -62,6 +62,13 @@ MainWindow::MainWindow(QWidget *parent)
             // Hide any previous error message
             ui->errorLabel->setVisible(false);
             
+            if (loginResult.role == "admin") {
+                // Open adminwindow
+                adminWindow = new adminwindow(loginResult.idUser, api, nullptr);
+                adminWindow->setAttribute(Qt::WA_DeleteOnClose);
+                adminWindow->showMaximized();
+            }
+            else {
             // Open the account selection window
             accountSelectWindow = new accountselect(loginResult, api, nullptr);
             accountSelectWindow->setAttribute(Qt::WA_DeleteOnClose);
@@ -69,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent)
                 accountSelectWindow = nullptr;
             });
             accountSelectWindow->showMaximized();
+            }
+
             
             if (pinTimeoutTimer) pinTimeoutTimer->stop();
             // Close the login window
@@ -185,6 +194,7 @@ void MainWindow::on_KirjauduButton_clicked()
     
     // Send login request to backend
     api->login(idCard, pin);
+
 }
 
 // Custom paint event to draw the background image

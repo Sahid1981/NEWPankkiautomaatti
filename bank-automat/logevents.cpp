@@ -7,8 +7,8 @@ logevents::logevents() {}
 logevents logevents::mapJson(const QJsonObject &json)
 {
     logevents logevent;
-    logevent.idlog = json["idlog"].toInt();
-    logevent.idaccount = json["idaccount"].toInt();
+    logevent.idLog = json["idLog"].toInt();
+    logevent.idAccount = json["idAccount"].toInt();
     
     // Parse UTC timestamp from backend
     QString utcTimeStr = json["time"].toString();
@@ -19,6 +19,6 @@ logevents logevents::mapJson(const QJsonObject &json)
     QDateTime localTime = utcTime.toLocalTime();
     logevent.time = localTime.toString("dd.MM.yyyy HH:mm:ss");
     
-    logevent.balancechange = json["balancechange"].toDouble();
+    logevent.balanceChange = json["balanceChange"].toDouble();
     return logevent;
 }

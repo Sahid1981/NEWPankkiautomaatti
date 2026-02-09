@@ -15,11 +15,14 @@
 // ApiClient is a thin wrapper around QNetworkAccessManager for calling the backend API
 // It stores the base URL and the current JWT token, builds requests, sends JSON, parses JSON responses and emits high-level signals for the UI
 ApiClient::ApiClient(QObject* parent)
-    : QObject(parent),
+    : QObject(parent)
     // Default backend address (local development)
-    m_baseUrl(QUrl("http://127.0.0.1:3000"))
+    //m_baseUrl(QUrl("http://127.0.0.1:3000"))
 {
+    QString db_url = getEnvValue("DB_IP");
+    m_baseUrl = (QUrl(db_url));
 }
+
 
 // Configure where the backend lives (useful for changing envs)
 void ApiClient::setBaseUrl(const QUrl& baseUrl) { m_baseUrl = baseUrl; }
@@ -68,7 +71,12 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
     }
 
     // Handle response asynchronously
-    connect(reply, &QNetworkReply::finished, this, [this, reply, path]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, path, body, method]() {
+
+        //DELETOI nämä 2 myöhemmin
+        qDebug() << "--- REAL-TIME DEBUG ---";
+        qDebug() << "Actual Path:" << path << " | Status:" << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
         ApiError err;
         QJsonDocument doc = readJson(reply, err);
 
@@ -89,6 +97,10 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
 
             // Fallback to Qt's error string
             if (err.message.isEmpty()) err.message = reply->errorString();
+
+            //DELETOI nämä 2 myöhemmin
+            qDebug() << "Server Error Message:" << doc.object().value("message").toString();
+            qDebug() << "Full Error Body:" << doc.toJson();
 
             emit requestFailed(err);
             reply->deleteLater();
@@ -157,6 +169,88 @@ void ApiClient::sendJson(const QString& method, const QString& path, const QJson
             emit withdrawSucceeded(idAccount, newBalance);
         }
 
+        // Special case for updating user
+        if (path.startsWith("/users/") && method == "PUT") {
+            QString idFromPath = path.section('/',2,2);
+            emit userUpdated(idFromPath);
+        }
+
+        // Special case for creating a user
+        if (path.startsWith("/users") && method == "POST") {
+            QString id = body.value("idUser").toString();
+            emit userCreated(id);
+        }
+
+        // Special case for deleting a user
+        if (path.startsWith("/users") && method == "DELETE") {
+            //QString id = body.value("idUser").toString();
+            emit userDeleted();
+        }
+
+        // Special case for creating account
+        if (path.startsWith("/accounts") && method == "POST") {
+            QByteArray responseData = doc.toJson(QJsonDocument::Compact);
+            emit accountCreated(responseData);
+        }
+
+        // Special case for updating creditlimit
+        if (path.startsWith("/accounts") && method == "PUT") {
+            int idFromPath = path.section('/',2,2).toInt();
+            emit accountCreditUpdated(idFromPath);
+        }
+
+        // Special case for deleting an account
+        if (path.startsWith("/accounts") && method == "DELETE") {
+            emit accountDeleted();
+        }
+
+        // Special case for linking account to card
+        if (path.startsWith("/cardaccount") && method == "POST") {
+            QByteArray responseData = doc.toJson(QJsonDocument::Compact);
+            emit cardAccountLinked(responseData);
+        }
+
+        // Special case for updating link between card and account
+        if (path.startsWith("/cardaccount") && method == "PUT") {
+            QString idFromPath = path.section('/',2,2);
+            emit cardLinkUpdated(idFromPath);
+        }
+
+        // Special case for deleting a link between account and card
+        if (path.startsWith("/cardaccount") && method == "DELETE") {
+            QString idFromPath = path.section('/',2,2);
+            emit cardLinkDeleted(idFromPath);
+        }
+
+        // Special case for locking card
+        if (path.startsWith("/cards/") && path.endsWith("/lock") && method == "POST") {
+            QString idFromPath = path.section('/',2,2);
+            emit cardLocked(idFromPath);
+        }
+
+        // Special case for unlocking card
+        if (path.startsWith("/cards/") && path.endsWith("/unlock") && method == "POST") {
+            QString idFromPath = path.section('/',2,2);
+            emit cardUnlocked(idFromPath);
+        }
+
+        // Special case for creating card
+        if (path.startsWith("/cards") && method == "POST") {
+            QByteArray responseData = doc.toJson(QJsonDocument::Compact);
+            emit cardCreated(responseData);
+        }
+
+        // Special case for deleting card
+        if (path.startsWith("/cards") && method == "DELETE") {
+            emit cardDeleted();
+        }
+
+        // Special case for updating PIN
+        if (path.startsWith("/cards/") && path.endsWith("/pin") && method == "PUT") {
+            QString idFromPath = path.section('/',2,2);
+            emit PINUpdated(idFromPath);
+        }
+
         reply->deleteLater();
     });
 }
@@ -172,7 +266,7 @@ void ApiClient::sendNoBody(const QString& method, const QString& path)
     else if (method == "POST") reply = m_nam.post(req, QByteArray());
     else reply = m_nam.sendCustomRequest(req, method.toUtf8());
 
-    connect(reply, &QNetworkReply::finished, this, [this, reply, path]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, path, method]() {
         const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         const bool ok = (reply->error() == QNetworkReply::NoError) && status >= 200 && status < 300;
 
@@ -221,6 +315,53 @@ void ApiClient::sendNoBody(const QString& method, const QString& path)
                 items.push_back(dto);
             }
             emit logsReceived(idAccount, items);
+        }
+
+        // Special-case: GET /users/{idUser} returns user data as an object
+        if (path.startsWith("/users/")) {
+            QByteArray user = doc.toJson(QJsonDocument::Compact);
+            emit userReceived(user);
+        }
+
+        // Special_case: GET /users returns all users as an QByteArray
+        if (path.startsWith("/users")) {
+            QByteArray users = doc.toJson(QJsonDocument::Compact);
+            emit allUsersReceived(users);
+        }
+
+        // Special-case: GET /accounts/{idAccount} returns account data as an object
+        if (path.startsWith("/accounts") && method == "GET") {
+            QByteArray o = doc.toJson(QJsonDocument::Compact);
+            emit accountReceived(o);
+        }
+
+        // Special-case: GET /accounts returns all users as an QByteArray
+        if (path.startsWith("/accounts") && method == "GET") {
+            QByteArray accounts = doc.toJson(QJsonDocument::Compact);
+            emit allAccountsReceived(accounts);
+        }
+
+        // Special-case: Get /logs/{idAccount} returns logs as an QByteArray
+        if (path.startsWith("/log/") && method == "GET") {
+            QByteArray logs = doc.toJson(QJsonDocument::Compact);
+            emit adminLogsReceived(logs);
+        }
+
+        if (path.startsWith("/cards/") && method == "GET") {
+            QByteArray card = doc.toJson(QJsonDocument::Compact);
+            emit cardReceived(card);
+        }
+
+        // Special-case: Get /cards returns all cards as an QByteArray
+        if (path.startsWith("/cards") && method == "GET") {
+            QByteArray cards = doc.toJson(QJsonDocument::Compact);
+            emit allCardsReceived(cards);
+        }
+
+        // Special-case: Create new card
+        if (path.startsWith("/cardaccount/") && method == "GET") {
+            QByteArray cardAccount = doc.toJson(QJsonDocument::Compact);
+            emit cardAccountReceived(cardAccount);
         }
 
         reply->deleteLater();
@@ -275,6 +416,26 @@ QJsonDocument ApiClient::readJson(QNetworkReply* reply, ApiError& errOut)
     return doc;
 }
 
+// Used to read from .env. Currently only IP is stored there.
+QString ApiClient::getEnvValue(QString secret)
+{
+    QFile file(QCoreApplication::applicationDirPath() + "/.env");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Opening .env failed. looked at" << QCoreApplication::applicationDirPath();
+        // returns empty to prevent crashing
+        return "";
+    }
+    QTextStream in(&file);
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+        if (line.contains(secret + "=")) {
+            QString secretKey = line.split("=").at(1).trimmed();
+            return secretKey;
+        }
+    }
+    return "";  //failsafe
+}
+
 // Convenience API methods used by the UI:
 // POST /auth/login with { idCard, pin }
 void ApiClient::login(const QString& idCard, const QString& pin)
@@ -301,6 +462,117 @@ void ApiClient::getBalance(int idAccount)
 void ApiClient::getAccountLogs(int idAccount)
 {
     sendNoBody("GET", QString("/atm/%1/logs").arg(idAccount));
+}
+
+void ApiClient::getUser(QString idUser)
+{
+    sendNoBody("GET", QString("/users/%1").arg(idUser));
+}
+
+void ApiClient::getAllUsers()
+{
+    sendNoBody("GET", QString("/users"));
+}
+
+void ApiClient::addUser(QString idUser, QString firstName, QString lastName, QString streetaddress, QString role)
+{
+    sendJson("POST", QString("/users"), QJsonObject{{"idUser", idUser},{"firstName", firstName},{"lastName",lastName},{"streetAddress", streetaddress}, {"role", role}});
+}
+
+//Role cannot currently be changed due to mysql procedure limitation
+void ApiClient::updateUser(QString idUser, QString firstName, QString lastName, QString streetaddress) //, QString role)
+{
+    sendJson("PUT", QString("/users/%1").arg(idUser), QJsonObject{{"idUser", idUser},{"firstName", firstName},{"lastName",lastName},{"streetAddress", streetaddress}});
+}
+
+void ApiClient::deleteUser(QString idUser)
+{
+    sendJson("DELETE", QString("/users/%1").arg(idUser), QJsonObject{{}});
+}
+
+void ApiClient::getAccount(int idAccount)
+{
+    sendNoBody("GET", QString("/accounts/%1").arg(idAccount));
+}
+
+void ApiClient::getAllAccounts()
+{
+    sendNoBody("GET", QString("/accounts"));
+}
+
+void ApiClient::addAccount(QString idUser, double balance, double creditLimit)
+{
+    sendJson("POST", QString("/accounts"), QJsonObject{{"idUser", idUser},{"balance", balance},{"creditLimit", creditLimit}});
+}
+
+void ApiClient::updateCreditLimit(int idAccount, double creditLimit)
+{
+    sendJson("PUT", QString("/accounts/%1").arg(idAccount), QJsonObject{{"creditLimit", creditLimit}});
+}
+
+void ApiClient::deleteAccount(int idAccount)
+{
+    sendJson("DELETE", QString("/accounts/%1").arg(idAccount), QJsonObject{{}});
+}
+
+void ApiClient::addCard(QString idCard, QString idUser, QString cardPIN)
+{
+    sendJson("POST", QString("/cards"), QJsonObject{{"idCard", idCard},{"idUser", idUser},{"cardPIN", cardPIN}});
+}
+
+void ApiClient::deleteCard(QString idCard)
+{
+    sendJson("DELETE", QString("/cards/%1").arg(idCard), QJsonObject{{}});
+}
+
+void ApiClient::updatePIN(QString idCard, QString PIN)
+{
+    sendJson("PUT", QString("/cards/%1/pin").arg(idCard), QJsonObject{{"cardPIN",PIN}});
+}
+
+void ApiClient::linkCard(QString idCard, int idAccount)
+{
+    sendJson("POST", QString("/cardaccount"), QJsonObject{{"idCard", idCard},{"idAccount", idAccount}});
+}
+
+void ApiClient::updateLink(QString idCard, int idAccount, int newIdAccount)
+{
+    sendJson("PUT", QString("/cardaccount/%1").arg(idCard), QJsonObject{{"idAccount", idAccount},{"newIdAccount", newIdAccount}});
+}
+
+void ApiClient::deleteLink(QString idCard, int idAccount)
+{
+    sendJson("DELETE", QString("/cardaccount/%1").arg(idCard), QJsonObject{{"idAccount", idAccount}});
+}
+
+void ApiClient::lockCard(QString idCard)
+{
+    sendJson("POST", QString("/cards/%1/lock").arg(idCard), QJsonObject{{"idCard", idCard}});
+}
+
+void ApiClient::unlockCard(QString idCard)
+{
+    sendJson("POST", QString("/cards/%1/unlock").arg(idCard), QJsonObject{{"idCard", idCard}});
+}
+
+void ApiClient::getAllCards()
+{
+    sendNoBody("GET", QString("/cards"));
+}
+
+void ApiClient::getCard(QString idCard)
+{
+    sendNoBody("GET", QString("/cards/%1").arg(idCard));
+}
+
+void ApiClient::getCardAccount(QString idCard)
+{
+    sendNoBody("GET", QString("/cardaccount/%1").arg(idCard));
+}
+
+void ApiClient::getAdminLogs(int idAccount)
+{
+    sendNoBody("GET", QString("/log/%1").arg(idAccount));
 }
 
 // POST /atm/{idAccount}/withdraw with { amount }

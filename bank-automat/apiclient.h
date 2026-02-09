@@ -15,6 +15,11 @@
 #include <QJsonDocument>
 #include <QVector>
 #include <QString>
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
+#include <QCoreApplication>
+#include <QDebug>
 
 class QNetworkReply;
 
@@ -52,6 +57,15 @@ struct LogItemDto {
     double balanceChange = 0.0; // Amount changed (+ / -)
 };
 
+// Data Transfer Object for all users
+struct AllUsers {
+    QString idUser;
+    QString firstName;
+    QString lastName;
+    QString streetAddress;
+    QString role;
+};
+
 // ApiClient is responsible for all HTTP communication with the backend
 // It wraps QNetworkAccessManager and exposes high-level API operations (login, logout, balance, withdrawals, logs) via Qt signals
 class ApiClient : public QObject
@@ -78,6 +92,33 @@ public:
     void withdrawCredit(int idAccount, double amount);
     void getAccountLogs(int idAccount);
 
+    void getUser(QString idUser);
+    void getAllUsers();
+    void addUser(QString idUser, QString fname, QString lname, QString streetaddress, QString role);
+    //Role cannot currenly be changed with this due to db procedure not having it
+    void updateUser(QString idUser, QString fname, QString lname, QString streetaddress); //, QString role);
+    void deleteUser(QString idUser);
+
+    void getAccount(int idAccount);
+    void getAllAccounts();
+    void addAccount(QString idUser, double balance, double creditLimit);
+    void updateCreditLimit(int idAccount, double creditLimit);
+    void deleteAccount(int idAccount);
+
+    void getAllCards();
+    void getCard(QString idCard);
+    void getCardAccount(QString idCard);
+    void addCard(QString idCard, QString idUser, QString cardPIN);
+    void deleteCard(QString idCard);
+    void updatePIN(QString idCard, QString PIN);
+    void linkCard(QString idCard, int idAccount);
+    void updateLink(QString idCard, int idAccount, int newIdAccount);
+    void deleteLink(QString idCard, int idAccount);
+    void lockCard(QString idCard);
+    void unlockCard(QString idCard);
+
+    void getAdminLogs(int idAccount);
+
 signals:
     // Emitted when login succeeds and all required data is parsed
     void loginSucceeded(const LoginResultDto& result);
@@ -90,6 +131,54 @@ signals:
     void withdrawSucceeded(int idAccount, double newBalance);
     // Emitted when account transaction logs are received
     void logsReceived(int idAccount, const QVector<LogItemDto>& logs);
+
+    // Emitted when user is received
+    void userReceived(const QByteArray& userInfo);
+    // Emitted when all users are receives
+    void allUsersReceived(const QByteArray& allUsers);
+    // Emitted when user is created
+    void userCreated(QString idUser);
+    // Emitted when user is updated
+    void userUpdated(QString idUser);
+    // Emitted when user is deleted
+    void userDeleted();
+
+    // Emitted when account is received
+    void accountReceived(const QByteArray& accountInfo);
+    // Emitted when all accounts are received
+    void allAccountsReceived(const QByteArray& allAccounts);
+    // Emitted when account is created
+    void accountCreated(const QByteArray& accountInfo);
+    // Emitted when creditlimit is updated
+    void accountCreditUpdated(int idAccount);
+    // Emittend when account is deleted
+    void accountDeleted();
+
+    // Emitted when all cards are received
+    void allCardsReceived(const QByteArray& allCards);
+    // Emitted when a card is received
+    void cardReceived(const QByteArray& allCards);
+    // Emitted when account is created
+    void cardCreated(const QByteArray& cardData);
+    // Emitted when account is deleted
+    void cardDeleted();
+    // Emitted when PIN is updated
+    void PINUpdated(QString idCard);
+    // Emitted when account(s) linked to card is received
+    void cardAccountReceived(const QByteArray& cardAccount);
+    // Emitted when account is linked to card
+    void cardAccountLinked(const QByteArray& cardAccountLinked);
+    // Emitted when card is locked
+    void cardLocked(QString cardLocked);
+    // Emitted when card is unlocked
+    void cardUnlocked(QString cardUnlocked);
+    // Emitted when account linked to card is updated
+    void cardLinkUpdated(QString idCard);
+    // Emitted when card-account link is deleted
+    void cardLinkDeleted(QString idCard);
+
+    // Emitted when all logs are received
+    void adminLogsReceived(const QByteArray& adminLogs);
 
     // Emitted whenever any API request fails
     void requestFailed(const ApiError& error);
@@ -106,6 +195,8 @@ private:
     static ApiError parseError(QNetworkReply* reply);
     // Read and parse JSON from a reply, also filling error metadata
     static QJsonDocument readJson(QNetworkReply* reply, ApiError& errOut);
+
+    QString getEnvValue(QString secret);
 
 private:
     QNetworkAccessManager m_nam;    // Qt network engine (handles async requests)

@@ -21,8 +21,16 @@ qt_add_executable(bank-automat
     account.h account.cpp account.ui
     logevents.h logevents.cpp
     logs.h logs.cpp
+    adminwindow.h adminwindow.cpp adminwindow.ui
+    user.h user.cpp
+    userdata.h userdata.cpp
+    accounts.h accounts.cpp
+    accountsdata.h accountsdata.cpp
+    card.h card.cpp
+    carddata.h carddata.cpp
     apiclient.cpp
     apiclient.h
+
 )
 
 
