@@ -9,8 +9,6 @@
 - **Authentication:** JWT  
 - **Swagger UI:** `GET /docs`
 
----
-
 ## 2) Authentication
 
 ### 2.1 Login
