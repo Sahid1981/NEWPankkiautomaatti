@@ -19,13 +19,13 @@ pankkiautomaatti/
 │ ├── db/ # SQL schema, procedures, seed data
 │ ├── middleware/ # Auth, authorization, error handling
 │ ├── routes/ # Express router resource files
-│ └── app.js # Express app entry
+│ ├── app.js # Express app entry
+│ └── API_CONTRACT_v2.md # REST API specification
 │
 ├── bank-automat/ # Qt (C++) ATM client
 │ ├── *.cpp / *.h # UI and logic
 │ └── CMakeLists.txt
 │
-├── API_CONTRACT_v2.md # REST API specification
 ├── SETUP_AUTOSTART.md # Backend automatic startup
 └── README.md # This file
 ```
@@ -136,7 +136,7 @@ The client communicates with the backend using the REST API defined in `API_CONT
 ## Documentation
 
 All REST endpoints, request/response formats, roles and permissions are documented in:<br>
-📄 [**API_CONTRACT_v2.md**](./API_CONTRACT_v2.md)<br>
+📄 [**API_CONTRACT_v2.md**](./backend/API_CONTRACT_v2.md)<br>
 This file is the **single source of truth** for the backend API.
 
 Backend automatic startup are documented in:<br>
