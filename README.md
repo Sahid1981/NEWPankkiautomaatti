@@ -201,7 +201,7 @@ mysql -u root -p bank_db < procedures.sql
 mysql -u root -p bank_db < seed.sql
 ```
 
-## 4. Start backend
+## 4. Start backend (running in development)
 
 ```bash
 cd backend
@@ -215,6 +215,38 @@ Swagger documentation:
 ```bash
 http://localhost:3000/docs
 ```
+
+## Production Deployment (PM2) & Process Management
+
+Backend is managed using **PM2** to ensure:
+- Automatic restart on crashes
+- Process monitoring
+- Background execution
+- Production-style process control
+
+PM2 configuration:
+- ecosystem.config.js
+- Startup instructions documented in:
+
+  SETUP_AUTOSTART.md
+
+If deployed, backend can be started using:
+
+```bash
+pm2 start ecosystem.config.js
+```
+This setup enables production-style backend management and supports CI/CD workflows.
+
+## GitHub Actions CI/CD
+
+The project includes CI configuration for backend and frontend.
+
+Continuous Integration:
+- Automatic build checks
+- Linting
+- Optional test execution
+
+This ensures code quality and maintainability.
 
 <div align="right">
 <a href="#table-of-contents">Back to top</a>
