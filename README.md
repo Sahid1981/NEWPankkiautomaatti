@@ -1,735 +1,350 @@
-# Group 2 Project
+# Bank ATM System
 
-## Sisällysluettelo
+A full-stack banking application developed as part of the Software Development Project course.
 
-- [Backend-osio](#backend-osio)
-  - [API Käynnistys](#api-käynnistys)
-  - [Autentikointi](#autentikointi)
-  - [REST API Endpoints](#rest-api-endpoints)
-    - [ATM-toiminnot (User)](#atm-toiminnot-user)
-    - [Käyttäjät (Admin)](#käyttäjät-admin)
-    - [Kortit (Admin)](#kortit-admin)
-    - [Tilit (Admin)](#tilit-admin)
-    - [Kortit ja Tilit (Admin)](#kortit-ja-tilit-admin)
-    - [Logit (Admin)](#logit-admin)
-  - [Backend status taulukko](#backend-status-taulukko)
-  - [Role-järjestelmä (Admin vs User)](#role-järjestelmä-admin-vs-user)
-  - [Ympäristömuuttujat (.env)](#ympäristömuuttujat-env)
-  - [Database](#database)
-  - [Tietokanta proseduurit](#tietokanta-proseduurit)
-- [Qt Widget (Frontend)](#qt-widget-frontend)
+This system simulates a real-world ATM environment consisting of:
 
-## Dokumentaatio
+![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Qt](https://img.shields.io/badge/Qt-%23217346.svg?style=for-the-badge&logo=Qt&logoColor=white)
+![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
+![Bash Script](https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
+![CMake](https://img.shields.io/badge/CMake-%23008FBA.svg?style=for-the-badge&logo=cmake&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
+![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
+![Markdown](https://img.shields.io/badge/markdown-%23000000.svg?style=for-the-badge&logo=markdown&logoColor=white)
 
-- **[API_CONTRACT_v0.md](backend/API_CONTRACT_v0.md)** - Kattava API-dokumentaatio ja tekninen sopimus
-- **[SETUP_AUTOSTART.md](SETUP_AUTOSTART.md)** - PM2 automaattikäynnistys ja tuotantoasennus
+The project demonstrates layered architecture, secure authentication, database transactions and full-stack integration.
 
-## Backend-osio
 
-[⬆️ Takaisin alkuun](#sisällysluettelo)
+# Project Poster
 
-### API Käynnistys
+![Project Poster](./bank-automat/images/background.png)
+HUOM: Tähän oikea kuva posterista, kunhan tehty.
+
+## Table of Contents
+
+- [Project Overview](#bank-atm-system)
+- [Project Poster](#project-poster)
+- [System Architecture](#system-architecture)
+- [Project Goals](#project-goals)
+- [Project Team](#project-team)
+- [Features Implemented](#features-implemented)
+- [Technologies Used](#technologies-used)
+- [Backend Setup](#backend-setup)
+- [Qt ATM Client](#qt-atm-client)
+- [Authentication Flow](#authentication-flow)
+- [Test Credentials](#test-credentials)
+- [Documentation](#documentation)
+- [Project Management](#project-management)
+- [Security Considerations](#security-considerations)
+- [License](#license)
+
+# System Architecture
+
+## System Architecture
+
+```text
++----------------------+
+|  Qt Desktop Client   |
+|  (C++ / Qt Widgets)  |
++----------+-----------+
+           |
+           | HTTP (JSON, JWT)
+           v
++----------------------+
+|  Node.js REST API    |
+|  (Express)           |
++----------+-----------+
+           |
+           | Stored Procedures
+           v
++----------------------+
+|  MySQL Database      |
++----------------------+
+```
+
+### Communication Flow
+
+1. Qt client sends HTTP request
+2. REST API validates JWT and business rules
+3. Stored procedure executes database logic
+4. JSON response returned to client
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Project Goals
+
+- Implement a layered backend architecture
+- Design and implement a REST API
+- Use stored procedures for database logic
+- Implement authentication with JWT
+- Create a working ATM UI in Qt
+- Fulfill course minimum and advanced requirements
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Project Team
+
+| Name | Responsibilities |
+|------|------------------|
+| [Juha Jermalainen](https://github.com/Sahid1981) | CRUD, Swagger, backend |
+| [Laura Similä](https://github.com/Llaamari) | Backend, REST API, frontend |
+| [Arttu Jämsä](https://github.com/Ard3J) | documentation, frontend, Qt |
+| [Valtteri Tenhunen](https://github.com/TTEVAR) | Image upload |
+
+(All members participated in planning, implementation and testing.)
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Features Implemented
+
+## Core Requirements (Grade 1–2)
+
+- Debit account support
+- Qt application startup user interface
+- Card login with PIN verification
+- Balance display
+- Withdrawal (20€, 40€, 50€, 100€)
+- 10 latest transactions
+- 10-second PIN timeout
+- Full CRUD operations for all database tables
+
+## Advanced Features (Grade 3–4)
+
+- Credit account support
+- Credit limit handling
+- Withdrawal of any amount (only €20 and €50 notes at ATM)
+- Persistent card locking (stored in database)
+- 30-second global inactivity timeout
+- Transaction history browsing (pagination)
+
+## Excellent-Level Features (Grade 5)
+
+- Dual card support (debit + credit in one card)
+- Account selection after login
+- UML state diagram created
+- Role-based authorization (admin / user)
+- Structured API contract documentation
+- Clean MVC-style backend structure
+- Additional features:
+   - Uploading and displaying images
+   - Swagger documentation
+   - Logs
+   - Adding tests to the backend
+   - CI/CD
+   - Extra Qt application (admin)
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Technologies Used
+
+## Backend
+- Node.js
+- Express
+- MySQL
+- JWT authentication
+- bcrypt (PIN hashing)
+- Stored procedures
+- Swagger documentation
+- CI/CD
+
+## Frontend
+- C++ (Qt Widgets)
+- QNetworkAccessManager (API client)
+- CMake build system
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Backend Setup
+
+## 1. Install dependencies
 
 ```bash
 cd backend
 npm install
-npm start
 ```
 
-API pyörii osoitteessa: `http://localhost:3000`
+## 2. Create .env file
 
-### Autentikointi
-
-[⬆️ Takaisin alkuun](#sisällysluettelo)
-
-#### Kirjautuminen (Login)
-
-- **POST /auth/login** - Kirjaudu sisään kortilla ja PIN-koodilla
-  ```json
-  {
-    "idCard": "CARD123456",
-    "pin": "1234"
-  }
-  ```
-  **Vastaus (200 OK):**
-  ```json
-  {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "card": {
-      "idCard": "CARD123456",
-      "idUser": "TESTUSER1",
-      "isLocked": false
-    },
-    "accounts": [
-      {
-        "idAccount": 14,
-        "type": "debit",
-        "balance": 500.00,
-        "creditLimit": 0.00
-      },
-      {
-        "idAccount": 15,
-        "type": "credit",
-        "balance": 0.00,
-        "creditLimit": 2000.00
-      }
-    ],
-    "requiresAccountSelection": true
-  }
-  ```
-
-#### Uloskirjautuminen (Logout)
-
-- **POST /auth/logout** - Kirjaudu ulos (token blacklistille)
-  - Vaatii: `Authorization: Bearer <token>` header
-
-#### Token käyttö
-
-Kaikki suojatut endpointit vaativat JWT-tokenin headerissa:
-```
-Authorization: Bearer <token>
-```
-
-### REST API Endpoints
-
-[⬆️ Takaisin alkuun](#sisällysluettelo)
-
-#### ATM-toiminnot (User)
-
-**Huom:** Vaativat JWT-tokenin ja omistajuuden tiliin
-
-- **GET /atm/:id** - Hae tilin saldo
-  ```json
-  {
-    "idAccount": 14,
-    "idUser": "TESTUSER1",
-    "balance": 500.00,
-    "creditLimit": 0.00
-  }
-  ```
-
-- **GET /atm/:id/logs** - Hae tilin tapahtumahistoria
-  ```json
-  {
-    "items": [
-      {
-        "idLog": 12,
-        "time": "2026-01-16T09:30:00.123000",
-        "balanceChange": -20.00
-      }
-    ]
-  }
-  ```
-
-- **POST /atm/:id/withdraw** - Nosta rahaa (debit-tili)
-  ```json
-  {
-    "amount": 40.00
-  }
-  ```
-  **Vastaus:**
-  ```json
-  {
-    "idAccount": 14,
-    "balance": 460.00,
-    "logged": true
-  }
-  ```
-
-- **POST /atm/:id/credit/withdraw** - Nosta rahaa (credit-tili)
-  ```json
-  {
-    "amount": 200.00
-  }
-  ```
-  **Vastaus:**
-  ```json
-  {
-    "idAccount": 15,
-    "balance": -200.00,
-    "logged": true
-  }
-  ```
-
-#### Käyttäjät (Admin)
-
-**Huom:** Vaativat JWT-tokenin ja `role: 'admin'`
-
-- **GET /users/:idUser** - Hae käyttäjä ID:llä
-  **Vastaus (200 OK)**
-  ```json
-  {
-    "idUser": "USER123",
-    "firstName": "Matti",
-    "lastName": "Meikäläinen",
-    "streetAddress": "Esimerkkitie 1",
-    "role": "user"
-  }
-  ```
-
-- **POST /users** - Luo uusi käyttäjä
-  ```json
-  {
-    "idUser": "USER123",
-    "firstName": "Matti",
-    "lastName": "Meikäläinen",
-    "streetAddress": "Esimerkkitie 1",
-    "role": "user"
-  }
-  ```
-  **Huom:** `role` kenttä on valinnainen (oletusarvo: "user"). Vaihtoehdot: "user" tai "admin".
-  
-  **Vastaus (201 Created)**
-  ```json
-  {
-    "idUser": "USER123",
-    "firstName": "Matti",
-    "lastName": "Meikäläinen",
-    "streetAddress": "Esimerkkitie 1",
-    "role": "user"
-  }
-  ```
-
-- **PUT /users/:idUser** - Päivitä käyttäjän tiedot
-  ```json
-  {
-    "firstName": "Maija",
-    "lastName": "Virtanen",
-    "streetAddress": "Uusitie 5"
-  }
-  ```
-  **Vastaus (200 OK)**
-  ```json
-  {
-    "idUser": "USER123",
-    "firstName": "Maija",
-    "lastName": "Virtanen",
-    "streetAddress": "Uusitie 5"
-  }
-  ```
-
-- **DELETE /users/:idUser** - Poista käyttäjä
-  **Vastaus (204 No Content)**
-
-#### Kortit (Admin)
-
-**Huom:** Vaativat JWT-tokenin ja `role: 'admin'`
-
-- **GET /cards** - Hae kaikki kortit
-  **Vastaus (200 OK)**
-  ```json
-  [
-    {
-      "idCard": "CARD123456",
-      "idUser": "TESTUSER1",
-      "isLocked": false
-    },
-    {
-      "idCard": "ADMINCARD",
-      "idUser": "ADMIN",
-      "isLocked": false
-    }
-  ]
-  ```
-
-- **GET /cards/:idCard** - Hae kortti ID:llä
-  **Vastaus (200 OK)**
-  ```json
-  {
-    "idCard": "CARD123456",
-    "idUser": "TESTUSER1",
-    "isLocked": false
-  }
-  ```
-
-- **POST /cards** - Luo uusi kortti (PIN hashataan bcryptillä)
-  ```json
-  {
-    "idCard": "CARD789012",
-    "idUser": "USER123",
-    "cardPIN": "1234"
-  }
-  ```
-  **Vastaus (201 Created)**
-  ```json
-  {
-    "idCard": "CARD789012",
-    "idUser": "USER123",
-    "isLocked": false
-  }
-  ```
-
-- **PUT /cards/:idCard/pin** - Päivitä kortin PIN
-  ```json
-  {
-    "cardPIN": "5678"
-  }
-  ```
-  **Vastaus (200 OK)**
-  ```json
-  {
-    "message": "PIN updated successfully"
-  }
-  ```
-
-- **POST /cards/:idCard/lock** - Lukitse kortti
-  **Vastaus: (204 No Content)**
-
-- **POST /cards/:idCard/unlock** - Avaa kortin lukitus
-  **Vastaus: (204 No Content)**
-
-- **DELETE /cards/:idCard** - Poista kortti
-  **Vastaus: (204 No Content)**
-
-#### Tilit (Admin)
-
-**Huom:** Vaativat JWT-tokenin ja `role: 'admin'`
-
-- **GET /accounts/:id** - Hae tilin tiedot
-  **Vastaus (200 OK)**
-  ```json
-  {
-    "idAccount": 14,
-    "idUser": "TESTUSER1",
-    "balance": 500.00,
-    "creditLimit": 0.00
-  }
-  ```
-
-- **POST /accounts** - Luo uusi tili
-  ```json
-  {
-    "idUser": "TESTUSER1",
-    "balance": 1000.00,
-    "creditLimit": 500.00
-  }
-  ```
-  **Vastaus (201 Created)**
-  ```json
-  {
-    "idAccount": 16,
-    "idUser": "TESTUSER1",
-    "balance": 1000.00,
-    "creditLimit": 500.00
-  }
-  ```
-
-- **PUT /accounts/:id** - Päivitä tilin credit limit
-  ```json
-  {
-    "creditLimit": 3000.00
-  }
-  ```
-  **Vastaus (200 OK)**
-  ```json
-  {
-    "message": "Credit limit updated successfully"
-  }
-  ```
-
-- **DELETE /accounts/:id** - Poista tili
-  **Vastaus: 204 No Content**
-  
-  **Huom:** Tili ei voi olla linkitettynä kortteihin
-
-#### Kortit ja Tilit (Admin)
-
-**Huom:** Vaativat JWT-tokenin ja `role: 'admin'`
-
-- **GET /cardaccount/:idCard** - Hae kortin linkitetyt tilit
-  **Vastaus (200 OK)**
-  ```json
-  [
-    {
-      "idCard": "CARD123456",
-      "idAccount": 14
-    },
-    {
-      "idCard": "CARD123456",
-      "idAccount": 15
-    }
-  ]
-  ```
-
-- **POST /cardaccount** - Linkitä kortti tiliin
-  ```json
-  {
-    "idCard": "CARD123456",
-    "idAccount": 1
-  }
-  ```
-  **Vastaus (201 Created)**
-  ```json
-  {
-    "message": "Card linked to account successfully"
-  }
-  ```
-
-- **PUT /cardaccount/:idCard** - Päivitä kortin tiliyhdistelmä
-  ```json
-  {
-    "IdAccount": 1,
-    "newIdAccount": 2
-  }
-  ```
-  **Vastaus (200 OK)**
-  ```json
-  {
-    "message": "Card account link updated successfully"
-  }
-  ```
-
-- **DELETE /cardaccount/:idCard** - Poista kortin ja tilin linkki
-  ```json
-  {
-    "IdAccount": 1
-  }
-  ```
-  **Vastaus: (204 No Content)**
-
-#### Logit (Admin)
-
-**Huom:** Vaativat JWT-tokenin ja `role: 'admin'`
-
-- **GET /log/:idAccount** - Hae tilin tapahtumalogit
-  - Palauttaa kaikki tilin tapahtumat uusimmasta vanhimpaan
-  - Esimerkki: `GET /log/1`
-  - Vastaus:
-  ```json
-  [
-    {
-      "idLog": 10,
-      "idAccount": 1,
-      "time": "2026-01-16T09:30:00.123000",
-      "balanceChange": -40.00
-    },
-    {
-      "idLog": 9,
-      "idAccount": 1,
-      "time": "2026-01-15T14:20:00.000000",
-      "balanceChange": 100.00
-    }
-  ]
-  ```
-
-### Backend status taulukko
-
-[⬆️ Takaisin alkuun](#sisällysluettelo)
-
-| Tilanne                                | Status                        |
-| -------------------------------------- | ----------------------------- |
-| GET onnistuu                           | **200 OK**                    |
-| POST luo resurssin                     | **201 Created**               |
-| DELETE onnistuu                        | **204 No Content**            |
-| Puuttuva / virheellinen data           | **400 Bad Request**           |
-| Ei kirjautunut                         | **401 Unauthorized**          |
-| Ei oikeuksia                           | **403 Forbidden**             |
-| Resurssia ei ole                       | **404 Not Found**             |
-| Duplikaatti (esim. kortti jo olemassa) | **409 Conflict**              |
-| Odottamaton virhe                      | **500 Internal Server Error** |
-
-### Role-järjestelmä (Admin vs User)
-
-[⬆️ Takaisin alkuun](#sisällysluettelo)
-
-Järjestelmässä on kaksi käyttäjäroolia:
-- **user** (oletus) - Tavallinen käyttäjä, pääsee `/atm/*` endpointeihin omilla tileillään
-- **admin** - Admin-käyttäjä, pääsee kaikkiin endpointeihin (`/users/*`, `/cards/*`, `/accounts/*`, `/log/*`, `/cardaccount/*`)
-
-**Admin-endpointit** (vaativat `role: 'admin'`):
-- `GET/POST/PUT/DELETE /users/*` - Käyttäjien hallinta
-- `GET/POST/PUT/DELETE /cards/*` - Korttien hallinta  
-- `GET/POST/PUT/DELETE /accounts/*` - Tilien hallinta
-- `GET/POST/PUT/DELETE /cardaccount/*` - Kortti-tili linkkien hallinta
-- `GET /log/*` - Lokien katselu
-
-**User-endpointit** (vaativat vain kirjautumisen ja omistajuuden):
-- `GET/POST /atm/*` - Omat tilit ja transaktiot
-
-**Testitunnukset:**
-- **Tavallinen käyttäjä**: Kortti: `CARD123456`, PIN: `1234`
-  - Debit-tili (ID: 14): 500.00 €
-  - Credit-tili (ID: 15): 2000.00 € luottoraja
-- **Admin-käyttäjä**: Kortti: `ADMINCARD`, PIN: `admin123`
-
-**Admin-käyttäjän luominen tietokantaan:**
-```sql
--- Luo admin-käyttäjä
-CALL sp_create_user('admin1', 'Admin', 'User', 'Admin Street', 'admin');
-
-
-
-### Ympäristömuuttujat (.env)
-
-Luo `backend/.env` tiedosto:
 ```env
-# Tietokanta
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=bank_db
 DB_PORT=3306
 
-# JWT
-JWT_SECRET=your-secret-key-here
+JWT_SECRET=your-secret-key
+PIN_PEPPER=your-pepper-value
 
-# PIN Pepper (lisäturvallisuus)
-PIN_PEPPER=your-pepper-here
-
-# Port
 PORT=3000
 ```
 
-### Database
+## 3. Initialize database
 
-[⬆️ Takaisin alkuun](#sisällysluettelo)
-
-**Skeeman ja proseduurien alustus:**
 ```bash
 cd backend/db
-sudo mysql -u root bank_db < schema.sql
-sudo mysql -u root bank_db < procedures.sql
-sudo mysql -u root bank_db < seed.sql
+mysql -u root -p bank_db < schema.sql
+mysql -u root -p bank_db < procedures.sql
+mysql -u root -p bank_db < seed.sql
 ```
 
-**Huom:** `seed.sql` sisältää testidatan (TESTUSER1 ja ADMIN käyttäjät)
-
-### Tietokanta proseduurit
-
-[⬆️ Takaisin alkuun](#sisällysluettelo)
-
-#### 1) Käyttäjät
-#### 2) Tilit
-#### 3) Kortit
-#### 4) Transaktiot
-#### 5) Luottotili
-#### 6) Tapahtumalogit
-
-#### Käyttäjien hallinta
-
-**Käyttäjän lisäys**
-```sql
--- Lisää uuden käyttäjän (role valinnainen, oletusarvo 'user')
-CALL sp_create_user(iduser, fname, lname, streetaddress, role);
--- Esimerkki: CALL sp_create_user('user123', 'Matti', 'Meikäläinen', 'Meikatie 1', 'user');
--- Admin: CALL sp_create_user('admin1', 'Admin', 'User', 'Admin St', 'admin');
-```
-
-**Käyttäjän poisto**
-```sql
--- Poistaa käyttäjän (käyttäjällä ei saa olla tilejä)
-CALL sp_delete_user(iduser);
--- Esimerkki: CALL sp_delete_user('user123');
-```
-
-**Käyttäjätietojen lukeminen**
-```sql
--- Hakee käyttäjän tiedot (mukaan lukien role)
-CALL sp_read_user_info(iduser);
--- Esimerkki: CALL sp_read_user_info('user123');
--- Palauttaa: iduser, fname, lname, streetaddress, role
-```
-
-**Käyttäjätietojen päivittäminen**
-```sql
--- Päivittää käyttäjän tiedot
-CALL sp_update_user_info(iduser, fname, lname, streetaddress);
--- Esimerkki: CALL sp_update_user_info('user123', 'Maija', 'Meikäläinen', 'Uusitie 2');
-```
-
-#### Tilien hallinta
-
-**Tilin lisäys**
-```sql
--- Lisää uuden tilin käyttäjälle
-CALL sp_add_account(iduser, balance, credit_limit);
--- Esimerkki: CALL sp_add_account('user123', 1000.00, 500.00);
-```
-
-**Tilin poisto**
-```sql
--- Poistaa tilin (tilillä ei saa olla kortteja, logit poistetaan automaattisesti)
-CALL sp_delete_account(idaccount);
--- Esimerkki: CALL sp_delete_account(1);
-```
-
-**Tilin tietojen lukeminen**
-```sql
--- Hakee tilin tiedot
-CALL sp_read_account_info(idaccount);
--- Esimerkki: CALL sp_read_account_info(1);
--- Palauttaa: idaccount, iduser, balance, creditlimit
-```
-
-#### Korttien hallinta
-
-**Kortin luominen**
-```sql
--- Luo uuden kortin (PIN on jo hashattu backendissä)
-CALL sp_create_card(idcard, iduser, hashed_pin);
--- Esimerkki: CALL sp_create_card('CARD789012', 'user123', '$2b$10$...');
-```
-
-**Kortin tietojen lukeminen**
-```sql
--- Hakee kortin tiedot (mukaan lukien cardPIN autentikoinnissa)
-CALL sp_read_card_info(idcard);
--- Esimerkki: CALL sp_read_card_info('CARD123456');
--- Palauttaa: idcard, cardPIN, iduser, is_locked
-```
-
-**Kaikkien korttien lukeminen**
-```sql
--- Hakee kaikki kortit (ilman PIN:ejä)
-CALL sp_read_all_cards();
-```
-
-**Kortin PIN:in päivitys**
-```sql
--- Päivittää kortin PIN:in (PIN on jo hashattu backendissä)
-CALL sp_update_card_pin(idcard, new_hashed_pin);
--- Esimerkki: CALL sp_update_card_pin('CARD123456', '$2b$10$...');
-```
-
-**Kortin linkitettyjen tilien hakeminen**
-```sql
--- Hakee kortin linkitetyt tilit
-CALL sp_get_card_info(idcard);
--- Esimerkki: CALL sp_get_card_info('CARD123456');
--- Palauttaa: idcard, idaccount
-```
-
-**Kortin linkitys tiliin**
-```sql
--- Linkittää kortin tiliin
-CALL sp_card_to_account(idcard, idaccount);
--- Esimerkki: CALL sp_card_to_account('CARD123456', 1);
-```
-
-**Kortin poisto**
-```sql
--- Poistaa kortin
-CALL sp_delete_card(idcard);
--- Esimerkki: CALL sp_delete_card('CARD123456');
-```
-
-**Kortin ja tilin linkin poisto**
-```sql
--- Poistaa kortin ja tilin välisen linkin
-CALL sp_remove_card_from_account(idcard, idaccount);
--- Esimerkki: CALL sp_remove_card_from_account('CARD123456', 1);
-```
-
-**Kortin tiliyhdistelmän päivitys**
-```sql
--- Päivittää kortin vanhasta tilistä uuteen tiliin
-CALL sp_update_card_linked_account(idcard, old_idaccount, new_idaccount);
--- Esimerkki: CALL sp_update_card_linked_account('CARD123456', 1, 2);
-```
-
-**Kortin lukitseminen**
-```sql
--- Lukitsee kortin ID:n perusteella
-CALL sp_card_lock(idcard);
--- Esimerkki: CALL sp_card_lock('CARD123456');
-```
-
-**Kortin lukituksen poisto**
-```sql
--- Poistaa kortin lukituksen ID:n perusteella
-CALL sp_card_unlock(idcard);
--- Esimerkki: CALL sp_card_unlock('CARD123456');
-```
-
-#### Tilin transaktiot
-
-**Talletus**
-```sql
--- Tallettaa rahaa tilille
-CALL sp_deposit(idaccount, amount);
--- Esimerkki: CALL sp_deposit(1, 100.00);
-```
-
-**Nosto**
-```sql
--- Nostaa rahaa tililtä
-CALL sp_withdraw(idaccount, amount);
--- Esimerkki: CALL sp_withdraw(1, 50.00);
-```
-
-**Tilisiirto**
-```sql
--- Siirtää rahaa tililtä toiselle
-CALL sp_transfer(idaccount_from, idaccount_to, amount);
--- Esimerkki: CALL sp_transfer(1, 2, 75.00);
-```
-
-#### Luottotili
-
-**Luoton nosto**
-```sql
--- Nostaa rahaa luottotililtä
-CALL sp_credit_withdraw(idaccount, amount);
--- Esimerkki: CALL sp_credit_withdraw(1, 200.00);
-```
-
-**Luoton takaisinmaksu**
-```sql
--- Maksaa rahaa takaisin luottotilille
-CALL sp_credit_repay(idaccount, amount);
--- Esimerkki: CALL sp_credit_repay(1, 150.00);
-```
-
-**Luottorajan päivitys**
-```sql
--- Päivittää tilin luottorajan
-CALL sp_update_creditlimit(idaccount, creditlimit);
--- Esimerkki: CALL sp_update_creditlimit(1, 2000.00);
-```
-
-#### Tapahtumalogit
-
-**Tilin lokien haku**
-```sql
--- Hakee tilin kaikki tapahtumalogit uusimmasta vanhimpaan
-CALL sp_read_account_logs(idaccount);
--- Esimerkki: CALL sp_read_account_logs(1);
--- Palauttaa: idlog, idaccount, time, balancechange
-```
-
-## Qt Widget (Frontend)
-
-[⬆️ Takaisin alkuun](#sisällysluettelo)
-
-### Käynnistys
+## 4. Start backend (running in development)
 
 ```bash
-cd bank-automat
-mkdir build
-cd build
-cmake ..
-make
-./bank_automat
+cd backend
+npm start
+```
+Backend runs at:
+```arduino
+http://localhost:3000
+```
+Swagger documentation:
+```bash
+http://localhost:3000/docs
 ```
 
-### Kirjautuminen
+## Production Deployment (PM2) & Process Management
 
-Sovellus pyytää kirjautumisessa:
-1. **Korttinumero** (esim. `CARD123456`)
-2. **PIN-koodi** (esim. `1234`)
+Backend is managed using **PM2** to ensure:
+- Automatic restart on crashes
+- Process monitoring
+- Background execution
+- Production-style process control
 
-Kirjautumisen jälkeen valitaan tili (jos käyttäjällä on useita tilejä).
+PM2 configuration:
+- ecosystem.config.js
+- Startup instructions documented in:
 
-### Testitunnukset
+  SETUP_AUTOSTART.md
 
-- **Tavallinen käyttäjä**: Kortti: `CARD123456`, PIN: `1234`
-- **Admin-käyttäjä**: Kortti: `ADMINCARD`, PIN: `admin123`
+If deployed, backend can be started using:
 
-### Ominaisuudet
+```bash
+pm2 start ecosystem.config.js
+```
+This setup enables production-style backend management and supports CI/CD workflows.
 
-- Korttinumeron ja PIN-koodin syöttö
-- Tilin valinta (kaksoiskortti)
-- Saldon tarkistus
-- Nostot (debit ja credit)
-- Tapahtumahistoria
-- Automaattinen uloskirjautuminen (timeout)
+## GitHub Actions CI/CD
+
+The project includes CI configuration for backend and frontend.
+
+Continuous Integration:
+- Automatic build checks
+- Linting
+- Optional test execution
+
+This ensures code quality and maintainability.
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Qt ATM Client
+
+1. Open `bank-automat` in Qt Creator
+2. Configure with CMake
+3. Build and run
+
+The client communicates with the backend using the REST API.
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Authentication Flow
+
+1. User enters card ID and PIN
+2. Backend validates PIN (bcrypt + pepper)
+3. JWT token issued
+4. Token stored in memory
+5. Token sent in Authorization header
+6. Account selected (if multiple)
+7. ATM operations performed
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Test Credentials
+
+### Regular User
+
+- Card: `CARD123456`
+- PIN: `1234`
+
+### Admin User
+
+- Card: `ADMINCARD`
+- PIN: `admin123`
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Documentation
+
+### REST API Contract
+
+📄 [API_CONTRACT_v2.md](./backend/API_CONTRACT_v2.md)
+
+### Stored Procedures
+
+📄 [STORED_PROCEDURES.md](./backend/db/STORED_PROCEDURES.md)
+
+### Backend Autostart (PM2)
+
+📄 [SETUP_AUTOSTART.md](./SETUP_AUTOSTART.md)
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Project Management
+
+- Git + GitHub version control
+- Feature branches + Pull Requests
+- Kanban board used for task management
+- Weekly progress meetings
+- Technical specification document created
+- UML diagrams (ER, component, state diagram)
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# Security Considerations
+
+- PIN codes stored as bcrypt hashes
+- Additional server-side pepper
+- JWT authentication
+- Role-based access control
+- Database access only through stored procedures
+- Server-side validation for all financial operations
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
+
+# License
+
+This project is developed for educational purposes.
+
+MIT License can be applied if published publicly.
+
+<div align="right">
+<a href="#table-of-contents">Back to top</a>
+</div>
