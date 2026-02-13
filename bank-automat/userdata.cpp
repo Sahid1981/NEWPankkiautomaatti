@@ -56,6 +56,7 @@ void userdata::updateModel()
     }
 }
 
+//Finds which row given isUser is in tableModel
 int userdata::findRow(QString idUser)
 {
     QList<QStandardItem *> matches = tableModel->findItems(idUser, Qt::MatchExactly, 0);
@@ -67,3 +68,4 @@ int userdata::findRow(QString idUser)
     }
     return 0;
 }
+
