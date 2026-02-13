@@ -55,3 +55,15 @@ void userdata::updateModel()
         tableModel->appendRow(rowItems);
     }
 }
+
+int userdata::findRow(QString idUser)
+{
+    QList<QStandardItem *> matches = tableModel->findItems(idUser, Qt::MatchExactly, 0);
+    QStandardItem *item = matches.value(0);
+    if(item) {
+        int row = item->row();
+        qDebug() << "Rivi: " << row;
+        return row;
+    }
+    return 0;
+}
