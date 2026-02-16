@@ -17,6 +17,7 @@ var cardsaccountsRouter = require('./routes/cardaccount');
 var accountsRouter = require('./routes/accounts');
 var logRouter = require('./routes/log');
 var atmRouter = require('./routes/atm');
+var avatarRouter = require('./routes/avatar');
 
 // Express-sovelluksen tuonti
 var app = express();
@@ -38,6 +39,7 @@ app.use('/cards', cardsRouter); // Admin: korttien hallinta
 app.use('/cardaccount', cardsaccountsRouter); // Admin: kortti-tili linkit
 app.use('/accounts', accountsRouter); // Admin: tilien hallinta
 app.use('/log', logRouter); // Admin: lokit
+app.use('/', avatarRouter);
 
 // Swagger UI
 const openapiPath = path.join(__dirname, 'openapi.yaml');
