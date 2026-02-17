@@ -22,8 +22,7 @@ The project demonstrates layered architecture, secure authentication, database t
 
 # Project Poster
 
-![Project Poster](./bank-automat/images/background.png)
-HUOM: Tähän oikea kuva posterista, kunhan tehty.
+![Project Poster](./poster%20for%20Group%202.pdf)
 
 ## Table of Contents
 
