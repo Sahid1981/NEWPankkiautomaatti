@@ -67,7 +67,7 @@ accountselect::accountselect(
     ui->btnSelectCredit->setVisible(hasCredit);
     
     // Add optional Edit Avatar button
-    m_btnEditAvatar = new QPushButton("Edit Avatar", ui->card);
+    m_btnEditAvatar = new QPushButton(""Vaihda \n profiilikuva"", ui->card);
     m_btnEditAvatar->setFixedSize(120, 36);
     m_btnEditAvatar->setStyleSheet(
         "background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-weight: bold;"
@@ -182,21 +182,24 @@ void accountselect::layoutHeaderControls()
 
     const QRect titleRect = ui->titleLabel->geometry();
     const int gap = 12;
+    const int edgeMargin = 30;
     const int cardMidY = ui->card->height() / 2;
 
     if (m_avatarPreview) {
-        const int avatarX = std::max(0, titleRect.left() - gap - m_avatarPreview->width());
+        const int wantedAvatarX = titleRect.left() - gap - m_avatarPreview->width();
+        const int maxAvatarX = std::max(edgeMargin, ui->card->width() - m_avatarPreview->width() - edgeMargin);
+        const int avatarX = std::clamp(wantedAvatarX, edgeMargin, maxAvatarX);
         const int maxAvatarY = std::max(0, ui->card->height() - m_avatarPreview->height());
          const int avatarY = std::clamp(cardMidY - (m_avatarPreview->height() / 2), 0, maxAvatarY);
         m_avatarPreview->move(avatarX, avatarY);
     }
 
     if (m_btnEditAvatar) {
-        const int maxX = std::max(0, ui->card->width() - m_btnEditAvatar->width());
+        const int maxX = std::max(edgeMargin, ui->card->width() - m_btnEditAvatar->width() - edgeMargin);
         const int wantedX = titleRect.right() + gap;
-        const int buttonX = std::clamp(wantedX, 0, maxX);
+        const int buttonX = std::clamp(wantedX, edgeMargin, maxX);
         const int maxButtonY = std::max(0, ui->card->height() - m_btnEditAvatar->height());
-        const int buttonY = std::clamp(cardMidY - (m_btnEditAvatar->height() / 2), 0, maxButtonY);
+        const int buttonY = std::clamp(cardMidY - (m_btnEditAvatar->height() / 2) - 5, 0, maxButtonY);
         m_btnEditAvatar->move(buttonX, buttonY);
     }
 }
