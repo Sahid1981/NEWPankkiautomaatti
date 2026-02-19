@@ -190,7 +190,7 @@ void accountselect::layoutHeaderControls()
         const int maxAvatarX = std::max(edgeMargin, ui->card->width() - m_avatarPreview->width() - edgeMargin);
         const int avatarX = std::clamp(wantedAvatarX, edgeMargin, maxAvatarX);
         const int maxAvatarY = std::max(0, ui->card->height() - m_avatarPreview->height());
-         const int avatarY = std::clamp(cardMidY - (m_avatarPreview->height() / 2), 0, maxAvatarY);
+        const int avatarY = std::clamp(cardMidY - (m_avatarPreview->height() / 2) - 15, 0, maxAvatarY);
         m_avatarPreview->move(avatarX, avatarY);
     }
 
@@ -199,7 +199,7 @@ void accountselect::layoutHeaderControls()
         const int wantedX = titleRect.right() + gap;
         const int buttonX = std::clamp(wantedX, edgeMargin, maxX);
         const int maxButtonY = std::max(0, ui->card->height() - m_btnEditAvatar->height());
-        const int buttonY = std::clamp(cardMidY - (m_btnEditAvatar->height() / 2) - 10, 0, maxButtonY);
+        const int buttonY = std::clamp(cardMidY - (m_btnEditAvatar->height() / 2), 0, maxButtonY);
         m_btnEditAvatar->move(buttonX, buttonY);
     }
 }
