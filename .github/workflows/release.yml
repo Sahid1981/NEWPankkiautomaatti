@@ -118,16 +118,16 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade aqtinstall
   
-      - name: Install Qt 6.6.3 (desktop msvc2022_64)
+      - name: Install Qt 6.9.1 (desktop msvc2022_64)
         run: |
-          python3 -m aqt install-qt windows desktop 6.6.3 msvc2022_64 `
+          python3 -m aqt install-qt windows desktop 6.9.1 msvc2022_64 `
             --outputdir "${{ github.workspace }}\Qt"
 
       # Export Qt env variables for CMake
       - name: Export Qt env for CMake
         run: |
-          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}\Qt\6.6.3\msvc2022_64" >> $env:GITHUB_ENV
-          echo "Qt6_DIR=${{ github.workspace }}\Qt\6.6.3\msvc2022_64\lib\cmake\Qt6" >> $env:GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}\Qt\6.9.1\msvc2022_64" >> $env:GITHUB_ENV
+          echo "Qt6_DIR=${{ github.workspace }}\Qt\6.9.1\msvc2022_64\lib\cmake\Qt6" >> $env:GITHUB_ENV
 
       # Install build tools
       - name: Install CMake and Ninja
@@ -203,7 +203,7 @@ jobs:
           body: |
             # Bank Automat ${{ steps.tag.outputs.version }}
             
-            Binary releases for Windows and Linux (built with Qt 6.6.3)
+            Binary releases for Windows and Linux (built with Qt 6.9.1)
             
             **Windows**: Extract `bank-automat-${{ steps.tag.outputs.version }}-windows.zip` and run the .exe
             
