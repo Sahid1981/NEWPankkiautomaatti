@@ -80,19 +80,56 @@ jobs:
         id: tag
         run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      # Create release artifacts
-      - name: Create release archive (Linux)
+      # Create release artifacts - DEB package
+      - name: Create DEB package
+        run: |
+          # Install fpm for building DEB packages
+          sudo apt-get install -y ruby ruby-dev
+          sudo gem install fpm
+          
+          # Create staging directory structure
+          mkdir -p deb_staging/usr/bin
+          mkdir -p deb_staging/usr/share/applications
+          
+          # Copy binary and make it executable
+          cp build/bank-automat deb_staging/usr/bin/bank-automat
+          chmod +x deb_staging/usr/bin/bank-automat
+          
+          # Copy desktop file for application menu
+          cp bank-automat.desktop deb_staging/usr/share/applications/
+          
+          # Copy postinst script
+          cp postinst deb_staging/
+          chmod +x deb_staging/postinst
+          
+          # Build DEB package with fpm
+          fpm -s dir -t deb \
+            -n bank-automat \
+            -v "${{ steps.tag.outputs.version }}" \
+            --description "Bank ATM Application" \
+            --url "https://github.com/yourusername/bank-automat" \
+            --license "MIT" \
+            --after-install deb_staging/postinst \
+            -C deb_staging
+          
+          # List created DEB
+          ls -lh bank-automat_*.deb
+
+      # Create tar.gz archive as fallback
+      - name: Create release archive (Linux tar.gz)
         run: |
           cd build
           tar -czf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz bank-automat
           ls -lh bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz
 
-      # Upload artifact
+      # Upload both DEB and tar.gz artifacts
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-binary
-          path: bank-automat/build/bank-automat-*-linux.tar.gz
+          path: |
+            bank-automat/bank-automat_*.deb
+            bank-automat/build/bank-automat-*-linux.tar.gz
 
   build-windows:
     runs-on: windows-latest
@@ -263,9 +300,28 @@ jobs:
             - Create a `.env` file in your home directory automatically
             - Include all necessary Qt dependencies (DLLs)
             
-            ## Linux Installation
+            ## Linux Installation (DEB - Ubuntu/Debian)
             
-            Extract with `tar -xzf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz` and run `./bank-automat`
+            ```bash
+            sudo dpkg -i bank-automat_${{ steps.tag.outputs.version }}_amd64.deb
+            ```
+            
+            The installer will ask for your database IP address and create the `.env` configuration file automatically.
+            
+            Then run:
+            ```bash
+            bank-automat
+            ```
+            
+            ## Linux Installation (Generic tar.gz)
+            
+            If you prefer a portable version or use a different Linux distribution:
+            
+            ```bash
+            tar -xzf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz
+            cd bank-automat
+            ./bank-automat
+            ```
             
             Then create a `.env` file in your home directory (`~/.env`):
             ```

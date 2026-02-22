@@ -1,0 +1,39 @@
+#!/bin/bash
+# Post-installation script for Bank Automat DEB package
+
+echo "======================================"
+echo "Bank Automat Installation Complete"
+echo "======================================"
+echo ""
+echo "Please configure the database IP address:"
+echo ""
+
+# Create .env file in user's home directory
+ENV_FILE="$HOME/.env"
+
+# Check if .env already exists
+if [ -f "$ENV_FILE" ]; then
+    echo ".env file already exists at $ENV_FILE"
+    read -p "Do you want to update it? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Skipping .env configuration"
+        exit 0
+    fi
+fi
+
+# Ask for DB_IP
+read -p "Enter Database IP address (default: localhost): " db_ip
+db_ip=${db_ip:-localhost}
+
+# Create or update .env file
+echo "DB_IP=$db_ip" > "$ENV_FILE"
+chmod 600 "$ENV_FILE"
+
+echo ""
+echo "✓ Configuration saved to $ENV_FILE"
+echo ""
+echo "You can now run Bank Automat from the applications menu or by typing:"
+echo "  bank-automat"
+echo ""
+echo "To change the database IP later, edit $ENV_FILE"
