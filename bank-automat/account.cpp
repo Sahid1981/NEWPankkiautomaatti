@@ -186,11 +186,13 @@ void account::on_btnSaldo_clicked()
     const bool isDebit = (creditlimit <= 0.0);
     
     if (isDebit) {
+        ui->label_3->setText("Tilin saldo:");
         ui->labelSaldoCreditLimit->hide();
         ui->labelSaldoLuottoaJaljella->hide();
         ui->labelSaldoCreditText->hide();
         ui->labelSaldoLuottoText->hide();
     } else {
+        ui->label_3->setText("Käytetty luotto:");
         ui->labelSaldoCreditLimit->show();
         ui->labelSaldoLuottoaJaljella->show();
         ui->labelSaldoCreditText->show();
