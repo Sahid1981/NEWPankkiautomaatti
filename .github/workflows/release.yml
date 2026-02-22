@@ -134,11 +134,24 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
+      # Debug: Find the executable
+      - name: Find executable
+        shell: pwsh
+        run: |
+          Write-Host "Searching for bank-automat.exe..."
+          Get-ChildItem -Path "build" -Recurse -Filter "bank-automat.exe" | ForEach-Object { Write-Host "Found: $($_.FullName)" }
+
       # Deploy Qt dependencies with windeployqt
       - name: Deploy Qt dependencies
         run: |
+          $exePath = (Get-ChildItem -Path "build" -Recurse -Filter "bank-automat.exe")[0].FullName
+          if ($null -eq $exePath) {
+            Write-Host "ERROR: Could not find bank-automat.exe"
+            exit 1
+          }
+          Write-Host "Found exe at: $exePath"
           $qtToolsDir = "${{ env.QT_ROOT_DIR }}/bin"
-          & "$qtToolsDir/windeployqt.exe" --release "build\bank-automat.exe"
+          & "$qtToolsDir/windeployqt.exe" --release "$exePath"
         shell: pwsh
 
       # Get tag name
