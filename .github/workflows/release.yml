@@ -209,7 +209,7 @@ jobs:
         shell: pwsh
         run: |
           # Pack the installer executable
-          Compress-Archive -Path "bank-automat/output/BankAutomatSetup-${{ steps.tag.outputs.version }}.exe" -DestinationPath "BankAutomatSetup-${{ steps.tag.outputs.version }}.zip"
+          Compress-Archive -Path "output/BankAutomatSetup-${{ steps.tag.outputs.version }}.exe" -DestinationPath "BankAutomatSetup-${{ steps.tag.outputs.version }}.zip"
           Get-Item "BankAutomatSetup-${{ steps.tag.outputs.version }}.zip"
 
       # Upload artifact
