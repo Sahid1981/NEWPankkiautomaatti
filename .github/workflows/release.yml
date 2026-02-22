@@ -136,6 +136,11 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
+      # Debug: List build directory contents
+      - name: List build directory
+        shell: pwsh
+        run: Get-ChildItem -Recurse build/
+
       # Create .env file with DB_IP
       - name: Create .env file
         run: |
@@ -152,7 +157,8 @@ jobs:
         shell: pwsh
         run: |
           cd build
-          Compress-Archive -Path bank-automat.exe, .env -DestinationPath "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
+          $exePath = (Get-ChildItem -Recurse -Filter "bank-automat.exe")[0].FullName
+          Compress-Archive -Path $exePath, ".env" -DestinationPath "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
           ls -lh "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
 
       # Upload artifact
