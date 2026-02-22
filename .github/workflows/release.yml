@@ -122,9 +122,10 @@ jobs:
           modules: 'qtnetworkauth'
 
       # Install build tools
-      - name: Install CMake and Ninja
-        run: |
-          choco install cmake ninja -y
+      - name: Install CMake
+        uses: cmake-js/setup-cmake@v3
+        with:
+          cmake-version: '3.28.x'
 
       # Configure, build
       - name: Configure (CMake, Release)
@@ -151,7 +152,7 @@ jobs:
         shell: pwsh
         run: |
           cd build
-          Compress-Archive -Path bank-automat.exe -DestinationPath "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
+          Compress-Archive -Path bank-automat.exe, .env -DestinationPath "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
           ls -lh "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
 
       # Upload artifact
