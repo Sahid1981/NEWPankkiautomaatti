@@ -173,8 +173,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-binary
-          path: bank-automat/build/bank-automat-*-windows.zip
-BankAutomatSetup-*
+          path: BankAutomatSetup-*.zip
   create-release:
     needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
@@ -215,19 +214,16 @@ BankAutomatSetup-*
             
             Download and extract `BankAutomatSetup-${{ steps.tag.outputs.version }}.zip`, then run `BankAutomatSetup-${{ steps.tag.outputs.version }}.exe` to install Bank Automat.
             
-            The installer includes all necessary Qt dependencies (DLLs).
+            The installer will:
+            - Ask for your database IP address
+            - Create a `.env` file in your home directory automatically
+            - Include all necessary Qt dependencies (DLLs)
             
             ## Linux Installation
             
             Extract with `tar -xzf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz` and run `./bank-automat`
             
-            ## Configuration
-            
-            Create a `.env` file in your home directory:
-            - **Linux/Mac**: `~/.env`
-            - **Windows**: `%USERPROFILE%\.env`
-            
-            Add the following content:
+            Then create a `.env` file in your home directory (`~/.env`):
             ```
             DB_IP=your_database_ip_here
             ```
