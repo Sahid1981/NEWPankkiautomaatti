@@ -115,21 +115,12 @@ jobs:
           # List created DEB
           ls -lh bank-automat_*.deb
 
-      # Create tar.gz archive as fallback
-      - name: Create release archive (Linux tar.gz)
-        run: |
-          cd build
-          tar -czf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz bank-automat
-          ls -lh bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz
-
-      # Upload both DEB and tar.gz artifacts
+      # Upload DEB artifact
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-binary
-          path: |
-            bank-automat/bank-automat_*.deb
-            bank-automat/build/bank-automat-*-linux.tar.gz
+          path: bank-automat/bank-automat_*.deb
 
   build-windows:
     runs-on: windows-latest
@@ -312,23 +303,6 @@ jobs:
             ```bash
             bank-automat
             ```
-            
-            ## Linux Installation (Generic tar.gz)
-            
-            If you prefer a portable version or use a different Linux distribution:
-            
-            ```bash
-            tar -xzf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz
-            cd bank-automat
-            ./bank-automat
-            ```
-            
-            Then create a `.env` file in your home directory (`~/.env`):
-            ```
-            DB_IP=your_database_ip_here
-            ```
-            
-            The application will automatically load this file on startup.
           draft: false
           prerelease: false
         env:
