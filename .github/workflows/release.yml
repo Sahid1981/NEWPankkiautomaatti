@@ -217,7 +217,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-binary
-          path: BankAutomatSetup-*.zip
+          path: bank-automat/BankAutomatSetup-*.zip
   create-release:
     needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
