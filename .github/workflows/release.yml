@@ -75,11 +75,6 @@ jobs:
       - name: Build
         run: cmake --build build --parallel
 
-      # Create .env file with DB_IP
-      - name: Create .env file
-        run: |
-          echo "DB_IP=${{ secrets.DB_IP }}" > build/.env
-
       # Get tag name from ref
       - name: Get tag name
         id: tag
@@ -139,15 +134,12 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
-      # Debug: List build directory contents
-      - name: List build directory
-        shell: pwsh
-        run: Get-ChildItem -Recurse build/
-
-      # Create .env file with DB_IP
-      - name: Create .env file
+      # Deploy Qt dependencies with windeployqt
+      - name: Deploy Qt dependencies
         run: |
-          echo "DB_IP=${{ secrets.DB_IP }}" | Out-File -FilePath build\.env -Encoding UTF8
+          $qtToolsDir = "${{ env.QT_ROOT_DIR }}/bin"
+          & "$qtToolsDir/windeployqt.exe" --release "build\bank-automat.exe"
+        shell: pwsh
 
       # Get tag name
       - name: Get tag name
@@ -155,14 +147,26 @@ jobs:
         shell: bash
         run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      # Install Inno Setup
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+
+      # Create installer with Inno Setup
+      - name: Create installer
+        run: |
+          $issPath = "bank-automat\BankAutomat.iss"
+          $version = "${{ steps.tag.outputs.version }}"
+          iscc.exe /DVersion=$version $issPath
+        shell: pwsh
+
       # Create release artifacts
       - name: Create release archive (Windows)
         shell: pwsh
         run: |
-          cd build
-          $exePath = (Get-ChildItem -Recurse -Filter "bank-automat.exe")[0].FullName
-          Compress-Archive -Path $exePath, ".env" -DestinationPath "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
-          Get-Item "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
+          # Pack the installer executable
+          Compress-Archive -Path "bank-automat/output/BankAutomatSetup-${{ steps.tag.outputs.version }}.exe" -DestinationPath "BankAutomatSetup-${{ steps.tag.outputs.version }}.zip"
+          Get-Item "BankAutomatSetup-${{ steps.tag.outputs.version }}.zip"
 
       # Upload artifact
       - name: Upload Windows artifact
@@ -170,7 +174,7 @@ jobs:
         with:
           name: windows-binary
           path: bank-automat/build/bank-automat-*-windows.zip
-
+BankAutomatSetup-*
   create-release:
     needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
@@ -207,9 +211,28 @@ jobs:
             
             Binary releases for Windows and Linux (built with Qt 6.9.1)
             
-            **Windows**: Extract `bank-automat-${{ steps.tag.outputs.version }}-windows.zip` and run the .exe
+            ## Windows Installation
             
-            **Linux**: Extract with `tar -xzf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz` and run `./bank-automat`
+            Download and extract `BankAutomatSetup-${{ steps.tag.outputs.version }}.zip`, then run `BankAutomatSetup-${{ steps.tag.outputs.version }}.exe` to install Bank Automat.
+            
+            The installer includes all necessary Qt dependencies (DLLs).
+            
+            ## Linux Installation
+            
+            Extract with `tar -xzf bank-automat-${{ steps.tag.outputs.version }}-linux.tar.gz` and run `./bank-automat`
+            
+            ## Configuration
+            
+            Create a `.env` file in your home directory:
+            - **Linux/Mac**: `~/.env`
+            - **Windows**: `%USERPROFILE%\.env`
+            
+            Add the following content:
+            ```
+            DB_IP=your_database_ip_here
+            ```
+            
+            The application will automatically load this file on startup.
           draft: false
           prerelease: false
         env:

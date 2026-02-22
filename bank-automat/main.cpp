@@ -4,6 +4,7 @@
 #include <QNetworkProxyFactory>
 
 #include "mainwindow.h"
+#include "envconfig.h"
 
 // Anonymous namespace limits the visibility of disableProxies() to this translation unit (this .cpp file only)
 namespace {
@@ -30,11 +31,14 @@ void disableProxies()
 
 int main(int argc, char *argv[])
 {
+    // Create the Qt application object first
+    QApplication app(argc, argv);
+    
+    // Load environment variables from .env file
+    EnvConfig::loadEnv();
+    
     // Ensure that no network proxies interfere with API calls
     disableProxies();
-
-    // Create the Qt application object
-    QApplication app(argc, argv);
 
     // Create the main window
     MainWindow w;
