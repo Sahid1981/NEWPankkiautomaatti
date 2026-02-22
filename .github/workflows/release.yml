@@ -159,7 +159,7 @@ jobs:
           cd build
           $exePath = (Get-ChildItem -Recurse -Filter "bank-automat.exe")[0].FullName
           Compress-Archive -Path $exePath, ".env" -DestinationPath "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
-          ls -lh "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
+          Get-Item "bank-automat-${{ steps.tag.outputs.version }}-windows.zip"
 
       # Upload artifact
       - name: Upload Windows artifact
