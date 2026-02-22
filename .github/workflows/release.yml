@@ -154,6 +154,19 @@ jobs:
           & "$qtToolsDir/windeployqt.exe" --release "$exePath"
         shell: pwsh
 
+      # Copy exe and deployments to build root for Inno Setup
+      - name: Prepare files for installer
+        shell: pwsh
+        run: |
+          $exePath = (Get-ChildItem -Path "build" -Recurse -Filter "bank-automat.exe")[0].FullName
+          $exeDir = Split-Path $exePath
+          Write-Host "Copying files from $exeDir to build\"
+          
+          # Copy all files from Release dir to build dir
+          Copy-Item "$exeDir\*" "build\" -Recurse -Force
+          Write-Host "Files copied successfully"
+          Get-ChildItem "build\" | Select-Object Name
+
       # Get tag name
       - name: Get tag name
         id: tag
