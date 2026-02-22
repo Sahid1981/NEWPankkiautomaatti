@@ -164,14 +164,32 @@ jobs:
       - name: Install Inno Setup
         run: |
           choco install innosetup -y
+          refreshenv
 
       # Create installer with Inno Setup
       - name: Create installer
-        run: |
-          $issPath = "bank-automat\BankAutomat.iss"
-          $version = "${{ steps.tag.outputs.version }}"
-          iscc.exe /DVersion=$version $issPath
         shell: pwsh
+        run: |
+          $issPath = "BankAutomat.iss"
+          $version = "${{ steps.tag.outputs.version }}"
+          Write-Host "Working directory: $(Get-Location)"
+          Write-Host "Looking for: $issPath"
+          Write-Host "Contents of current dir:"
+          Get-ChildItem
+          
+          # Try to find iscc.exe
+          $iscPath = "C:\Program Files (x86)\Inno Setup 6\iscc.exe"
+          if (-not (Test-Path $iscPath)) {
+            $iscPath = "C:\Program Files\Inno Setup 6\iscc.exe"
+          }
+          
+          if (Test-Path $iscPath) {
+            Write-Host "Using iscc from: $iscPath"
+            & "$iscPath" /DVersion=$version $issPath
+          } else {
+            Write-Host "ERROR: Could not find iscc.exe"
+            exit 1
+          }
 
       # Create release artifacts
       - name: Create release archive (Windows)
