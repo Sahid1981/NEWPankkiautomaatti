@@ -112,22 +112,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Install Qt 6.6.3 with aqtinstall
-      - name: Install aqtinstall (pip)
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade aqtinstall
-  
-      - name: Install Qt 6.9.1 (desktop msvc2022_64)
-        run: |
-          python3 -m aqt install-qt windows desktop 6.9.1 msvc2022_64 `
-            --outputdir "${{ github.workspace }}\Qt"
-
-      # Export Qt env variables for CMake
-      - name: Export Qt env for CMake
-        run: |
-          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}\Qt\6.9.1\msvc2022_64" >> $env:GITHUB_ENV
-          echo "Qt6_DIR=${{ github.workspace }}\Qt\6.9.1\msvc2022_64\lib\cmake\Qt6" >> $env:GITHUB_ENV
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.9.1'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          modules: 'qtnetworkauth'
 
       # Install build tools
       - name: Install CMake and Ninja
