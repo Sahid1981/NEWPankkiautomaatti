@@ -1,0 +1,309 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: ./bank-automat
+
+    env:
+      BACKEND_IP: ${{ secrets.SERVER_HOST }}
+      BACKEND_PORT: 3000
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Qt 6.6.3 with aqtinstall
+      - name: Install aqtinstall (pip)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade aqtinstall
+  
+      - name: Install Qt 6.6.3 (desktop gcc_64)
+        run: |
+          python3 -m aqt install-qt linux desktop 6.6.3 gcc_64 \
+            --outputdir "$GITHUB_WORKSPACE/Qt"
+
+      # Export Qt env variables for CMake
+      - name: Export Qt env for CMake
+        run: |
+          echo "CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/Qt/6.6.3/gcc_64" >> $GITHUB_ENV
+          echo "Qt6_DIR=$GITHUB_WORKSPACE/Qt/6.6.3/gcc_64/lib/cmake/Qt6" >> $GITHUB_ENV
+
+      # Build tools (CMake, Ninja)
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cmake build-essential
+
+      # Xvfb and Qt 6 Linux dependencies
+      - name: Install Xvfb and Qt 6 Linux deps
+        run: |
+          sudo apt-get install -y \
+            xvfb x11-utils \
+            libxcb-cursor0 \
+            libxkbcommon-x11-0 libxkbcommon0 \
+            libxcb1 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+            libxcb-randr0 libxcb-render-util0 libxcb-shape0 \
+            libxcb-shm0 libxcb-sync1 libxcb-xinerama0 libxcb-xfixes0 libxcb-xkb1 \
+            libgl1 libegl1 \
+            libx11-dev libxext-dev libxrender-dev libxi-dev libxfixes-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev \
+            libxcb1-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev \
+            libxcb-randr0-dev libxcb-render-util0-dev libxcb-shape0-dev \
+            libxcb-shm0-dev libxcb-sync-dev libxcb-xinerama0-dev libxcb-xfixes0-dev libxcb-xkb-dev \
+            mesa-common-dev libgl1-mesa-dev
+
+      # Configure, build
+      - name: Configure (CMake + Ninja, Release)
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      # Get tag name from ref
+      - name: Get tag name
+        id: tag
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      # Create release artifacts - DEB package
+      - name: Create DEB package
+        run: |
+          # Install fpm for building DEB packages
+          sudo apt-get install -y ruby ruby-dev
+          sudo gem install fpm
+          
+          # Create staging directory structure
+          mkdir -p deb_staging/usr/bin
+          mkdir -p deb_staging/usr/share/applications
+          
+          # Copy binary and make it executable
+          cp build/bank-automat deb_staging/usr/bin/bank-automat
+          chmod +x deb_staging/usr/bin/bank-automat
+          
+          # Copy desktop file for application menu
+          cp bank-automat.desktop deb_staging/usr/share/applications/
+          
+          # Copy postinst script
+          cp postinst deb_staging/
+          chmod +x deb_staging/postinst
+          
+          # Build DEB package with fpm
+          fpm -s dir -t deb \
+            -n bank-automat \
+            -v "${{ steps.tag.outputs.version }}" \
+            --description "Bank ATM Application" \
+            --url "https://github.com/yourusername/bank-automat" \
+            --license "MIT" \
+            --after-install deb_staging/postinst \
+            -C deb_staging
+          
+          # List created DEB
+          ls -lh bank-automat_*.deb
+
+      # Upload DEB artifact
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-binary
+          path: bank-automat/bank-automat_*.deb
+
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: ./bank-automat
+
+    env:
+      BACKEND_IP: ${{ secrets.SERVER_HOST }}
+      BACKEND_PORT: 3000
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.9.1'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          modules: 'qtnetworkauth'
+
+      # Install build tools
+      - name: Install CMake
+        uses: jwlawson/actions-setup-cmake@v1.14
+        with:
+          cmake-version: '3.28.x'
+
+      # Configure, build
+      - name: Configure (CMake, Release)
+        run: |
+          cmake -S . -B build `
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      # Debug: Find the executable
+      - name: Find executable
+        shell: pwsh
+        run: |
+          Write-Host "Searching for bank-automat.exe..."
+          Get-ChildItem -Path "build" -Recurse -Filter "bank-automat.exe" | ForEach-Object { Write-Host "Found: $($_.FullName)" }
+
+      # Deploy Qt dependencies with windeployqt
+      - name: Deploy Qt dependencies
+        run: |
+          $exePath = (Get-ChildItem -Path "build" -Recurse -Filter "bank-automat.exe")[0].FullName
+          if ($null -eq $exePath) {
+            Write-Host "ERROR: Could not find bank-automat.exe"
+            exit 1
+          }
+          Write-Host "Found exe at: $exePath"
+          $qtToolsDir = "${{ env.QT_ROOT_DIR }}/bin"
+          & "$qtToolsDir/windeployqt.exe" --release "$exePath"
+        shell: pwsh
+
+      # Copy exe and deployments to build root for Inno Setup
+      - name: Prepare files for installer
+        shell: pwsh
+        run: |
+          $exePath = (Get-ChildItem -Path "build" -Recurse -Filter "bank-automat.exe")[0].FullName
+          $exeDir = Split-Path $exePath
+          Write-Host "Copying files from $exeDir to build\"
+          
+          # Copy all files from Release dir to build dir
+          Copy-Item "$exeDir\*" "build\" -Recurse -Force
+          Write-Host "Files copied successfully"
+          Get-ChildItem "build\" | Select-Object Name
+
+      # Get tag name
+      - name: Get tag name
+        id: tag
+        shell: bash
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      # Install Inno Setup
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+          refreshenv
+
+      # Create installer with Inno Setup
+      - name: Create installer
+        shell: pwsh
+        run: |
+          $issPath = "BankAutomat.iss"
+          $version = "${{ steps.tag.outputs.version }}"
+          Write-Host "Working directory: $(Get-Location)"
+          Write-Host "Looking for: $issPath"
+          Write-Host "Contents of current dir:"
+          Get-ChildItem
+          
+          # Try to find iscc.exe
+          $iscPath = "C:\Program Files (x86)\Inno Setup 6\iscc.exe"
+          if (-not (Test-Path $iscPath)) {
+            $iscPath = "C:\Program Files\Inno Setup 6\iscc.exe"
+          }
+          
+          if (Test-Path $iscPath) {
+            Write-Host "Using iscc from: $iscPath"
+            & "$iscPath" /DVersion=$version $issPath
+          } else {
+            Write-Host "ERROR: Could not find iscc.exe"
+            exit 1
+          }
+
+      # Create release artifacts
+      - name: Create release archive (Windows)
+        shell: pwsh
+        run: |
+          # Pack the installer executable
+          Compress-Archive -Path "output/BankAutomatSetup-${{ steps.tag.outputs.version }}.exe" -DestinationPath "BankAutomatSetup-${{ steps.tag.outputs.version }}.zip"
+          Get-Item "BankAutomatSetup-${{ steps.tag.outputs.version }}.zip"
+
+      # Upload artifact
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-binary
+          path: bank-automat/BankAutomatSetup-*.zip
+  create-release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Get tag name
+      - name: Get tag name
+        id: tag
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      # Download artifacts
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-binary
+          path: ./artifacts
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-binary
+          path: ./artifacts
+
+      # Create GitHub Release with both artifacts
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./artifacts/*
+          body: |
+            # Bank Automat ${{ steps.tag.outputs.version }}
+            
+            Binary releases for Windows and Linux (built with Qt 6.9.1)
+            
+            ## Windows Installation
+            
+            Download and extract `BankAutomatSetup-${{ steps.tag.outputs.version }}.zip`, then run `BankAutomatSetup-${{ steps.tag.outputs.version }}.exe` to install Bank Automat.
+            
+            The installer will:
+            - Ask for your database IP address
+            - Create a `.env` file in your home directory automatically
+            - Include all necessary Qt dependencies (DLLs)
+            
+            ## Linux Installation (DEB - Ubuntu/Debian)
+            
+            ```bash
+            sudo dpkg -i bank-automat_${{ steps.tag.outputs.version }}_amd64.deb
+            ```
+            
+            The installer will ask for your database IP address and create the `.env` configuration file automatically.
+            
+            Then run:
+            ```bash
+            bank-automat
+            ```
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

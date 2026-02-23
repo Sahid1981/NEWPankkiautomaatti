@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Bank Automat
+Comment=Bank ATM Application
+Exec=bank-automat
+Icon=application-x-executable
+Categories=Office;Utility;
+Terminal=false

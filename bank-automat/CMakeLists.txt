@@ -17,6 +17,7 @@ qt_add_executable(bank-automat
     mainwindow.h
     mainwindow.ui
     images.qrc
+    envconfig.h
     accountselect.h accountselect.cpp accountselect.ui
     account.h account.cpp account.ui
     avatar.h avatar.cpp
